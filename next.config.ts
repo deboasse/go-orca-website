@@ -46,6 +46,22 @@ const nextConfig: NextConfig = {
           { key: "Cache-Control", value: "public, max-age=3600" },
         ],
       },
+      {
+        source: "/.well-known/oauth-authorization-server",
+        headers: [
+          { key: "Content-Type", value: "application/json" },
+          { key: "Cache-Control", value: "public, max-age=3600" },
+          { key: "Access-Control-Allow-Origin", value: "*" },
+        ],
+      },
+      {
+        source: "/.well-known/oauth-protected-resource",
+        headers: [
+          { key: "Content-Type", value: "application/json" },
+          { key: "Cache-Control", value: "public, max-age=3600" },
+          { key: "Access-Control-Allow-Origin", value: "*" },
+        ],
+      },
     ];
   },
 };

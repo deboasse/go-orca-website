@@ -1,0 +1,7 @@
+{
+  "resource": "https://go-orca.tech",
+  "authorization_servers": ["https://go-orca.tech"],
+  "bearer_methods_supported": ["header"],
+  "resource_documentation": "https://go-orca.tech/.well-known/api-catalog",
+  "scopes_supported": ["leads:read", "leads:write"]
+}

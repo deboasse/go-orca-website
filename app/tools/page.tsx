@@ -18,10 +18,10 @@ const toolSchema = {
   description: "Free interactive calculators, comparison tools, and cost guides for business operators.",
   url: "https://go-orca.tech/tools",
   hasPart: [
-    { "@type": "SoftwareApplication", name: "CRM ROI Calculator", url: "https://go-orca.tech/tools/crm-roi-calculator", applicationCategory: "BusinessApplication" },
-    { "@type": "SoftwareApplication", name: "Customer Acquisition Cost Calculator", url: "https://go-orca.tech/tools/cac-calculator", applicationCategory: "BusinessApplication" },
-    { "@type": "SoftwareApplication", name: "Custom CRM Cost Estimator", url: "https://go-orca.tech/tools/crm-cost-estimator", applicationCategory: "BusinessApplication" },
-    { "@type": "SoftwareApplication", name: "App Development Cost Guide", url: "https://go-orca.tech/tools/app-development-cost", applicationCategory: "BusinessApplication" },
+    { "@type": "SoftwareApplication", name: "CRM ROI Calculator", url: "https://go-orca.tech/tools/crm-roi-calculator", applicationCategory: "BusinessApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } },
+    { "@type": "SoftwareApplication", name: "Customer Acquisition Cost Calculator", url: "https://go-orca.tech/tools/cac-calculator", applicationCategory: "BusinessApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } },
+    { "@type": "SoftwareApplication", name: "Custom CRM Cost Estimator", url: "https://go-orca.tech/tools/crm-cost-estimator", applicationCategory: "BusinessApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } },
+    { "@type": "SoftwareApplication", name: "App Development Cost Guide", url: "https://go-orca.tech/tools/app-development-cost", applicationCategory: "BusinessApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } },
   ],
 };
 

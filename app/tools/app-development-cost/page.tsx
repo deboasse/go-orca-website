@@ -9,11 +9,14 @@ export const metadata: Metadata = {
 
 const schema = {
   "@context": "https://schema.org",
-  "@type": "Article",
-  headline: "Custom App Development Cost Guide 2025",
+  "@type": "SoftwareApplication",
+  name: "App Development Cost Guide",
   url: "https://go-orca.tech/tools/app-development-cost",
-  author: { "@type": "Organization", name: "Go-Orca.Tech" },
-  description: "Detailed guide to custom web and mobile app development costs in 2025.",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description: "Real cost ranges for custom web and mobile app development in 2025. From MVP to full product.",
+  provider: { "@type": "Organization", name: "Go-Orca.Tech", url: "https://go-orca.tech" },
 };
 
 const costRanges = [
