@@ -1,6 +1,6 @@
 # auth.md
 
-You are an agent. This service supports **agentic registration**: discover → register → call API → handle revocation.
+You are an agent. This service supports **agentic registration**: discover → register → (claim if needed) → call API → handle revocation. Follow the steps in order.
 
 Examples use `https://go-orca.tech` as both the resource server and authorization server.
 
@@ -30,25 +30,29 @@ Response:
 GET /.well-known/oauth-authorization-server
 ```
 
-The response includes an `agent_auth` block with `skill`, `register_uri`, and supported scopes.
+The `agent_auth` block contains `skill`, `register_uri`, `claim_uri`, `revocation_uri`, and `identity_types_supported`.
 
 ## Step 2 — Pick a method
 
-This service supports **client_credentials** only. No anonymous or email-verification flows.
+Use this decision tree:
 
-Contact [hello@go-orca.tech](mailto:hello@go-orca.tech) or submit the form at `https://go-orca.tech/contact` to request API access. You will receive a `client_id` and `client_secret`.
+1. **You have a user identity and can mint an ID-JAG** → [identity_assertion + id-jag](#identity_assertion--id-jag)
+2. **You have only the user's email** → [identity_assertion + email](#identity_assertion--email)
+3. **You have neither** → [anonymous](#anonymous)
 
-## Step 3 — Register / obtain a token
+Check `agent_auth.identity_types_supported` to confirm the method is accepted before sending.
+
+## Step 3 — Register
+
+### anonymous
 
 ```http
-POST /api/auth/login
+POST /api/agent/auth
 Content-Type: application/json
 
 {
-  "grant_type": "client_credentials",
-  "client_id": "<your_client_id>",
-  "client_secret": "<your_client_secret>",
-  "scope": "leads:read leads:write"
+  "type": "anonymous",
+  "requested_credential_type": "api_key"
 }
 ```
 
@@ -56,53 +60,137 @@ Response (200):
 
 ```json
 {
-  "access_token": "<token>",
-  "token_type": "Bearer",
-  "expires_in": 604800,
-  "scope": "leads:read leads:write"
+  "registration_id": "reg_...",
+  "registration_type": "anonymous",
+  "credential_type": "api_key",
+  "credential": "sk_...",
+  "credential_expires": null,
+  "scopes": ["leads:read"],
+  "claim_url": "https://go-orca.tech/api/agent/auth/claim",
+  "claim_token": "clm_...",
+  "claim_token_expires": "2026-06-01T00:00:00.000Z",
+  "post_claim_scopes": ["leads:read", "leads:write"]
 }
 ```
 
-## Step 4 — Use the credential
+You have a usable credential immediately. To unlock full scopes, complete the claim ceremony (Step 4). Otherwise skip to Step 5.
+
+### identity_assertion + id-jag
+
+Mint an ID-JAG with `aud` = `https://go-orca.tech`, short expiry, fresh `jti`.
+
+```http
+POST /api/agent/auth
+Content-Type: application/json
+
+{
+  "type": "identity_assertion",
+  "assertion_type": "urn:ietf:params:oauth:token-type:id-jag",
+  "assertion": "<your ID-JAG JWT>",
+  "requested_credential_type": "api_key"
+}
+```
+
+Response (200):
+
+```json
+{
+  "registration_id": "reg_...",
+  "registration_type": "agent-provider",
+  "credential_type": "api_key",
+  "credential": "sk_...",
+  "credential_expires": null,
+  "scopes": ["leads:read", "leads:write"]
+}
+```
+
+Go to Step 5.
+
+### identity_assertion + email
+
+```http
+POST /api/agent/auth
+Content-Type: application/json
+
+{
+  "type": "identity_assertion",
+  "assertion_type": "verified_email",
+  "assertion": "user@example.com",
+  "requested_credential_type": "api_key"
+}
+```
+
+Response (200):
+
+```json
+{
+  "registration_id": "reg_...",
+  "registration_type": "email-verification",
+  "claim_url": "https://go-orca.tech/api/agent/auth/claim",
+  "claim_token": "clm_...",
+  "claim_token_expires": "2026-06-01T00:00:00.000Z",
+  "post_claim_scopes": ["leads:read", "leads:write"]
+}
+```
+
+No credential yet. Go to Step 4.
+
+## Step 4 — Claim ceremony
+
+### 4a. Trigger claim email (anonymous only)
+
+```http
+POST /api/agent/auth/claim
+Content-Type: application/json
+
+{
+  "claim_token": "clm_...",
+  "email": "user@example.com"
+}
+```
+
+### 4b. User reads back 6-digit OTP from email
+
+### 4c. Submit OTP
+
+```http
+POST /api/agent/auth/claim/complete
+Content-Type: application/json
+
+{
+  "claim_token": "clm_...",
+  "otp": "123456"
+}
+```
+
+## Step 5 — Use the credential
 
 ```http
 GET /api/leads
-Authorization: Bearer <access_token>
+Authorization: Bearer <credential>
 ```
-
-Available scopes:
 
 | Scope | Access |
 |---|---|
-| `leads:read` | Read leads from the pipeline |
+| `leads:read` | Read leads |
 | `leads:write` | Update lead status and notes |
 
-## Step 5 — Handle revocation
-
-Credentials expire after 7 days. On a 401, drop the token and re-run Step 3.
-
-This service does not issue refresh tokens. Re-authenticate with client credentials when the token expires.
+On a 401, drop the credential and restart at Step 1.
 
 ## Public endpoints (no auth required)
 
-| Path | Method | Description |
-|---|---|---|
-| `/` | GET | Marketing homepage |
-| `/contact` | GET | Contact / quote form |
-| `/tools/*` | GET | Free business calculators |
-| `/api/quote` | POST | Submit a quote request |
+| Path | Method |
+|---|---|
+| `/` | GET |
+| `/contact` | GET |
+| `/tools/*` | GET |
+| `/api/quote` | POST |
 
 ## Errors
 
 | Code | What to do |
 |---|---|
-| 401 | Token expired or invalid — re-authenticate at Step 3 |
-| 403 | Scope insufficient — request the required scope |
-| 429 | Rate limited — back off and retry |
-| 5xx | Exponential backoff, retry the same request |
-
-## More
-
-- [API Catalog](https://go-orca.tech/.well-known/api-catalog)
-- [Agent Skills](https://go-orca.tech/.well-known/agent-skills/index.json)
-- [MCP Server Card](https://go-orca.tech/.well-known/mcp/server-card.json)
+| 401 | Credential expired or invalid — restart at Step 1 |
+| 403 | Scope insufficient |
+| 429 | Back off and retry |
+| 5xx | Exponential backoff, retry |

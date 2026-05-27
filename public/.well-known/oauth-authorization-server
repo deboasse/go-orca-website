@@ -10,11 +10,19 @@
   "service_documentation": "https://go-orca.tech/.well-known/api-catalog",
   "agent_auth": {
     "skill": "https://go-orca.tech/auth.md",
-    "register_uri": "https://go-orca.tech/contact",
-    "supported": true,
-    "grant_types": ["client_credentials"],
-    "token_endpoint": "https://go-orca.tech/api/auth/login",
-    "scopes": ["leads:read", "leads:write"],
-    "pkce_required": true
+    "register_uri": "https://go-orca.tech/api/agent/auth",
+    "claim_uri": "https://go-orca.tech/api/agent/auth/claim",
+    "revocation_uri": "https://go-orca.tech/api/agent/auth/revoke",
+    "identity_types_supported": ["anonymous", "identity_assertion"],
+    "anonymous": {
+      "credential_types_supported": ["api_key"]
+    },
+    "identity_assertion": {
+      "assertion_types_supported": [
+        "urn:ietf:params:oauth:token-type:id-jag",
+        "verified_email"
+      ],
+      "credential_types_supported": ["api_key"]
+    }
   }
 }
