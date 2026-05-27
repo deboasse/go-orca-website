@@ -1,38 +1,105 @@
 # auth.md
 
-## Public Access (No Auth Required)
+You are an agent. This service supports **agentic registration**: discover → register → call API → handle revocation.
 
-All marketing pages, free tools, and the quote submission form are publicly accessible with no authentication.
+Examples use `https://go-orca.tech` as both the resource server and authorization server.
 
-| Path | Auth |
+## Step 1 — Discover
+
+### 1a. Fetch the Protected Resource Metadata
+
+```http
+GET /.well-known/oauth-protected-resource
+```
+
+Response:
+
+```json
+{
+  "resource": "https://go-orca.tech",
+  "authorization_servers": ["https://go-orca.tech"],
+  "bearer_methods_supported": ["header"],
+  "resource_documentation": "https://go-orca.tech/.well-known/api-catalog",
+  "scopes_supported": ["leads:read", "leads:write"]
+}
+```
+
+### 1b. Fetch the Authorization Server metadata
+
+```http
+GET /.well-known/oauth-authorization-server
+```
+
+The response includes an `agent_auth` block with `skill`, `register_uri`, and supported scopes.
+
+## Step 2 — Pick a method
+
+This service supports **client_credentials** only. No anonymous or email-verification flows.
+
+Contact [hello@go-orca.tech](mailto:hello@go-orca.tech) or submit the form at `https://go-orca.tech/contact` to request API access. You will receive a `client_id` and `client_secret`.
+
+## Step 3 — Register / obtain a token
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "grant_type": "client_credentials",
+  "client_id": "<your_client_id>",
+  "client_secret": "<your_client_secret>",
+  "scope": "leads:read leads:write"
+}
+```
+
+Response (200):
+
+```json
+{
+  "access_token": "<token>",
+  "token_type": "Bearer",
+  "expires_in": 604800,
+  "scope": "leads:read leads:write"
+}
+```
+
+## Step 4 — Use the credential
+
+```http
+GET /api/leads
+Authorization: Bearer <access_token>
+```
+
+Available scopes:
+
+| Scope | Access |
 |---|---|
-| `/` | None |
-| `/about` | None |
-| `/contact` | None |
-| `/tools/*` | None |
-| `POST /api/quote` | None |
+| `leads:read` | Read leads from the pipeline |
+| `leads:write` | Update lead status and notes |
 
-## Agent Access
+## Step 5 — Handle revocation
 
-Agents may read all public pages freely. Content is available in Markdown via content negotiation (`Accept: text/markdown`) on major routes.
+Credentials expire after 7 days. On a 401, drop the token and re-run Step 3.
 
-The quote form (`POST /api/quote`) accepts unauthenticated requests — agents may submit on behalf of users.
+This service does not issue refresh tokens. Re-authenticate with client credentials when the token expires.
 
-## Protected Resources
+## Public endpoints (no auth required)
 
-Administrative and CRM APIs are not intended for external agent use and require an admin session cookie. Do not attempt to access `/api/clients`, `/api/leads`, `/api/onboard`, or `/api/payments` without explicit authorization from Go-Orca.
+| Path | Method | Description |
+|---|---|---|
+| `/` | GET | Marketing homepage |
+| `/contact` | GET | Contact / quote form |
+| `/tools/*` | GET | Free business calculators |
+| `/api/quote` | POST | Submit a quote request |
 
-## OAuth (Leads API)
+## Errors
 
-A leads API is available for authorized integrations using OAuth 2.0.
-
-- **Authorization server:** `https://go-orca.tech/.well-known/oauth-authorization-server`
-- **Protected resource metadata:** `https://go-orca.tech/.well-known/oauth-protected-resource`
-- **Scopes:** `leads:read`, `leads:write`
-- **Grant types:** `authorization_code`, `client_credentials`
-- **PKCE:** required (`S256`)
-
-Contact hello@go-orca.tech to request API access.
+| Code | What to do |
+|---|---|
+| 401 | Token expired or invalid — re-authenticate at Step 3 |
+| 403 | Scope insufficient — request the required scope |
+| 429 | Rate limited — back off and retry |
+| 5xx | Exponential backoff, retry the same request |
 
 ## More
 
