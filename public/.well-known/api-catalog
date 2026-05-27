@@ -1,0 +1,27 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://go-orca.tech",
+      "service-desc": [
+        {
+          "href": "https://go-orca.tech/.well-known/openapi.json",
+          "type": "application/json",
+          "title": "Go-Orca Public API"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://go-orca.tech/tools",
+          "type": "text/html",
+          "title": "Go-Orca Tools & Calculators"
+        }
+      ],
+      "status": [
+        {
+          "href": "https://go-orca.tech/api/health",
+          "type": "application/json"
+        }
+      ]
+    }
+  ]
+}

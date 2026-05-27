@@ -1,0 +1,49 @@
+{
+  "serverInfo": {
+    "name": "go-orca-tools",
+    "version": "1.0.0",
+    "description": "Go-Orca.Tech MCP server exposing marketing calculators and CRM cost estimation tools for AI agents.",
+    "homepage": "https://go-orca.tech",
+    "contact": "hello@go-orca.tech"
+  },
+  "transport": {
+    "type": "http",
+    "endpoint": "https://go-orca.tech/api/mcp"
+  },
+  "capabilities": {
+    "tools": true,
+    "resources": false,
+    "prompts": false
+  },
+  "tools": [
+    {
+      "name": "calculate_crm_roi",
+      "description": "Calculate the ROI of implementing a custom CRM. Provide current tool costs, team size, and hours lost per week to get annual savings and payback period.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "team_size": { "type": "number", "description": "Number of people using the CRM" },
+          "hours_per_week_lost": { "type": "number", "description": "Hours lost per person per week due to inefficient tools" },
+          "average_hourly_rate": { "type": "number", "description": "Average hourly cost per employee (USD)" },
+          "monthly_tool_costs": { "type": "number", "description": "Current monthly spend on CRM/tools (USD)" },
+          "crm_investment": { "type": "number", "description": "One-time CRM build investment (USD)" }
+        },
+        "required": ["team_size", "hours_per_week_lost", "average_hourly_rate", "crm_investment"]
+      }
+    },
+    {
+      "name": "estimate_crm_cost",
+      "description": "Estimate the cost to build a custom CRM based on team size, required modules, and desired timeline.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "team_size": { "type": "number" },
+          "modules": { "type": "array", "items": { "type": "string" }, "description": "e.g. ['pipeline', 'contacts', 'inbox', 'reports']" },
+          "integrations_count": { "type": "number" },
+          "timeline_weeks": { "type": "number" }
+        },
+        "required": ["team_size", "modules"]
+      }
+    }
+  ]
+}
