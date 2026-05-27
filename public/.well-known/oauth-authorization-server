@@ -10,6 +10,7 @@
   "service_documentation": "https://go-orca.tech/.well-known/api-catalog",
   "agent_auth": {
     "supported": true,
+    "register_uri": "https://go-orca.tech/contact",
     "grant_types": ["client_credentials"],
     "token_endpoint": "https://go-orca.tech/api/auth/login",
     "scopes": ["leads:read", "leads:write"],
