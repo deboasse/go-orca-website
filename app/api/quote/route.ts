@@ -58,21 +58,23 @@ export async function POST(req: Request) {
 
     const resend = getResend();
 
-    // — Notify Vinny —
-    await resend.emails.send({
+    // — Notify team —
+    const { error: notifyErr } = await resend.emails.send({
       from: FROM,
       to: [NOTIFY_EMAIL],
       subject: `New quote request from ${name}${company ? ` · ${company}` : ""}`,
       html: notifyHtml({ name, email, company, role, business_type, business_size, timeline, pain_points, goals, notes }),
     });
+    if (notifyErr) throw new Error(`Resend notify error: ${notifyErr.message}`);
 
     // — Confirm to the client —
-    await resend.emails.send({
+    const { error: confirmErr } = await resend.emails.send({
       from: FROM,
       to: [email],
       subject: "We received your quote request — Go-Orca.Tech",
       html: confirmHtml({ name }),
     });
+    if (confirmErr) throw new Error(`Resend confirm error: ${confirmErr.message}`);
 
     return NextResponse.json({ ok: true });
   } catch (err) {
