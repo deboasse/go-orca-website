@@ -41,46 +41,78 @@ async function ensureTable() {
 }
 
 export async function POST(req: Request) {
+  // ── 1. Parse & validate ──────────────────────────────────────────────────
+  let body: Record<string, unknown>;
   try {
-    const body = await req.json();
-    const { name, email, company, role, business_type, business_size, current_tools, pain_points, goals, timeline, notes } = body;
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
 
-    if (!name || !email) {
-      return NextResponse.json({ error: "Name and email are required" }, { status: 400 });
-    }
+  const { name, email, company, role, business_type, business_size,
+          current_tools, pain_points, goals, timeline, notes } = body as Record<string, string | null | undefined>;
 
+  if (!name || !email) {
+    return NextResponse.json({ error: "Name and email are required" }, { status: 400 });
+  }
+
+  // ── 2. Save to database (critical — fail the request if this fails) ──────
+  try {
     await ensureTable();
     const sql = getSql();
     await sql`
       INSERT INTO leads (name, email, company, role, business_type, business_size, current_tools, pain_points, goals, timeline, notes)
-      VALUES (${name}, ${email}, ${company ?? null}, ${role ?? null}, ${business_type ?? null}, ${business_size ?? null}, ${current_tools ?? null}, ${pain_points ?? null}, ${goals ?? null}, ${timeline ?? null}, ${notes ?? null})
+      VALUES (${name}, ${email}, ${company ?? null}, ${role ?? null}, ${business_type ?? null},
+              ${business_size ?? null}, ${current_tools ?? null}, ${pain_points ?? null},
+              ${goals ?? null}, ${timeline ?? null}, ${notes ?? null})
     `;
+  } catch (dbErr) {
+    const msg = dbErr instanceof Error ? dbErr.message : String(dbErr);
+    console.error("[/api/quote] DB error:", msg);
+    // Surface DB errors in the response so they show up in the browser during debugging
+    return NextResponse.json(
+      { error: `Database error: ${msg}` },
+      { status: 500 }
+    );
+  }
 
+  // ── 3. Send emails (best-effort — never fail the request over email) ─────
+  const emailErrors: string[] = [];
+  try {
     const resend = getResend();
 
-    // — Notify team —
     const { error: notifyErr } = await resend.emails.send({
       from: FROM,
       to: [NOTIFY_EMAIL],
       subject: `New quote request from ${name}${company ? ` · ${company}` : ""}`,
       html: notifyHtml({ name, email, company, role, business_type, business_size, timeline, pain_points, goals, notes }),
     });
-    if (notifyErr) throw new Error(`Resend notify error: ${notifyErr.message}`);
+    if (notifyErr) {
+      emailErrors.push(`notify: ${notifyErr.message}`);
+      console.error("[/api/quote] Resend notify error:", notifyErr.message);
+    }
 
-    // — Confirm to the client —
     const { error: confirmErr } = await resend.emails.send({
       from: FROM,
       to: [email],
       subject: "We received your quote request — Go-Orca.Tech",
       html: confirmHtml({ name }),
     });
-    if (confirmErr) throw new Error(`Resend confirm error: ${confirmErr.message}`);
-
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("[/api/quote]", err);
-    return NextResponse.json({ error: "Submission failed. Please try again." }, { status: 500 });
+    if (confirmErr) {
+      emailErrors.push(`confirm: ${confirmErr.message}`);
+      console.error("[/api/quote] Resend confirm error:", confirmErr.message);
+    }
+  } catch (emailErr) {
+    const msg = emailErr instanceof Error ? emailErr.message : String(emailErr);
+    emailErrors.push(`exception: ${msg}`);
+    console.error("[/api/quote] Email exception:", msg);
   }
+
+  // Lead is saved — return success even if emails had issues
+  return NextResponse.json({
+    ok: true,
+    ...(emailErrors.length > 0 && { email_warnings: emailErrors }),
+  });
 }
 
 // ── Email templates ──────────────────────────────────────────────────────────
