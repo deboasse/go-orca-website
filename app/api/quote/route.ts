@@ -2,10 +2,18 @@ import { neon } from "@neondatabase/serverless";
 import { Resend } from "resend";
 import { NextResponse } from "next/server";
 
-// Lazy-init so module evaluation doesn't fail at build time without env vars
+// Lazy-init so module evaluation doesn't fail at build time without env vars.
+// Tries all common names set by Vercel integrations (Neon, custom).
 function getSql() {
-  const url = process.env.GO_ORCA_DB_DATABASE_URL;
-  if (!url) throw new Error("GO_ORCA_DB_DATABASE_URL is not set");
+  const url =
+    process.env.GO_ORCA_DB_DATABASE_URL ??   // custom / dashboard project
+    process.env.DATABASE_URL ??               // Neon integration default
+    process.env.POSTGRES_URL_NON_POOLING ??  // Neon integration (serverless-safe)
+    process.env.POSTGRES_URL;                 // Neon integration pooled
+  if (!url) {
+    const tried = "GO_ORCA_DB_DATABASE_URL, DATABASE_URL, POSTGRES_URL_NON_POOLING, POSTGRES_URL";
+    throw new Error(`No DB URL found. Tried: ${tried}`);
+  }
   return neon(url);
 }
 function getResend() {
@@ -38,6 +46,22 @@ async function ensureTable() {
       updated_at  timestamptz NOT NULL DEFAULT now()
     )
   `;
+}
+
+// GET /api/quote — env var presence check (no secret values exposed)
+export function GET() {
+  const dbKey =
+    process.env.GO_ORCA_DB_DATABASE_URL ? "GO_ORCA_DB_DATABASE_URL" :
+    process.env.DATABASE_URL ? "DATABASE_URL" :
+    process.env.POSTGRES_URL_NON_POOLING ? "POSTGRES_URL_NON_POOLING" :
+    process.env.POSTGRES_URL ? "POSTGRES_URL" :
+    null;
+
+  return NextResponse.json({
+    db: dbKey ? `✓ found as ${dbKey}` : "✗ missing — set GO_ORCA_DB_DATABASE_URL or DATABASE_URL",
+    resend: process.env.RESEND_API_KEY ? "✓ set" : "✗ missing — RESEND_API_KEY not found",
+    from: process.env.RESEND_FROM_EMAIL ?? "(default) Go-Orca <hello@go-orca.tech>",
+  });
 }
 
 export async function POST(req: Request) {
