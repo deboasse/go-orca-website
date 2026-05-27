@@ -13,7 +13,7 @@ function getResend() {
 }
 
 const FROM = process.env.RESEND_FROM_EMAIL ?? "Go-Orca <hello@go-orca.tech>";
-const NOTIFY_EMAIL = "mxvinicius@gmail.com";
+const NOTIFY_EMAIL = "hello@go-orca.tech";
 
 // Ensure the leads table exists — idempotent, safe to run on every cold start
 async function ensureTable() {
