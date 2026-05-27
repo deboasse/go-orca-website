@@ -2,37 +2,63 @@ import { neon } from "@neondatabase/serverless";
 import { Resend } from "resend";
 import { NextResponse } from "next/server";
 
-// Lazy-init so module evaluation doesn't fail at build time without env vars.
-// Tries all common names set by Vercel integrations (Neon, custom).
+// ── HTML escaping ─────────────────────────────────────────────────────────────
+// All user-supplied fields are escaped before being placed in email HTML.
+// Prevents XSS in email clients that render raw HTML (rare but real).
+function h(s: string | null | undefined): string {
+  if (!s) return "";
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
+
+// ── Field length limits ───────────────────────────────────────────────────────
+const LIMITS: Record<string, number> = {
+  name:          200,
+  email:         254,
+  company:       200,
+  role:          200,
+  business_type: 200,
+  business_size: 100,
+  current_tools: 1_000,
+  pain_points:   5_000,
+  goals:         5_000,
+  timeline:      100,
+  notes:         5_000,
+};
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+// ── Lazy-init DB (no build-time evaluation) ───────────────────────────────────
 function getSql() {
   const url =
-    process.env.GO_ORCA_DB_DATABASE_URL ??   // custom / dashboard project
-    process.env.DATABASE_URL ??               // Neon integration default
-    process.env.POSTGRES_URL_NON_POOLING ??  // Neon integration (serverless-safe)
-    process.env.POSTGRES_URL;                 // Neon integration pooled
-  if (!url) {
-    const tried = "GO_ORCA_DB_DATABASE_URL, DATABASE_URL, POSTGRES_URL_NON_POOLING, POSTGRES_URL";
-    throw new Error(`No DB URL found. Tried: ${tried}`);
-  }
+    process.env.GO_ORCA_DB_DATABASE_URL ??
+    process.env.DATABASE_URL ??
+    process.env.POSTGRES_URL_NON_POOLING ??
+    process.env.POSTGRES_URL;
+  if (!url) throw new Error("No DB URL configured");
   return neon(url);
 }
 function getResend() {
   return new Resend(process.env.RESEND_API_KEY);
 }
 
-const FROM = process.env.RESEND_FROM_EMAIL ?? "Go-Orca <hello@go-orca.tech>";
-const NOTIFY_EMAIL = "hello@go-orca.tech";
+const FROM          = process.env.RESEND_FROM_EMAIL ?? "Go-Orca <hello@go-orca.tech>";
+const NOTIFY_EMAIL  = "hello@go-orca.tech";
+const MAX_BODY_BYTES = 32_000; // 32 KB — more than enough for a quote form
 
-// Ensure the leads table exists — idempotent, safe to run on every cold start
 async function ensureTable() {
   const sql = getSql();
   await sql`
     CREATE TABLE IF NOT EXISTS leads (
-      id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-      name        text NOT NULL,
-      email       text NOT NULL,
-      company     text,
-      role        text,
+      id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      name           text NOT NULL,
+      email          text NOT NULL,
+      company        text,
+      role           text,
       business_type  text,
       business_size  text,
       current_tools  text,
@@ -40,66 +66,90 @@ async function ensureTable() {
       goals          text,
       timeline       text,
       notes          text,
-      source      text NOT NULL DEFAULT 'website',
-      status      text NOT NULL DEFAULT 'new',
-      created_at  timestamptz NOT NULL DEFAULT now(),
-      updated_at  timestamptz NOT NULL DEFAULT now()
+      source         text NOT NULL DEFAULT 'website',
+      status         text NOT NULL DEFAULT 'new',
+      created_at     timestamptz NOT NULL DEFAULT now(),
+      updated_at     timestamptz NOT NULL DEFAULT now()
     )
   `;
 }
 
-
 export async function POST(req: Request) {
-  // ── 1. Parse & validate ──────────────────────────────────────────────────
-  let body: Record<string, unknown>;
+  // ── 1. Body size guard ────────────────────────────────────────────────────
+  const contentLength = Number(req.headers.get("content-length") ?? 0);
+  if (contentLength > MAX_BODY_BYTES) {
+    return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+  }
+
+  // ── 2. Parse ──────────────────────────────────────────────────────────────
+  let raw: Record<string, unknown>;
   try {
-    body = await req.json();
+    raw = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { name, email, company, role, business_type, business_size,
-          current_tools, pain_points, goals, timeline, notes } = body as Record<string, string | null | undefined>;
-
-  if (!name || !email) {
-    return NextResponse.json({ error: "Name and email are required" }, { status: 400 });
+  // ── 3. Coerce fields to strings, enforce length limits ────────────────────
+  function field(key: string): string | null {
+    const v = raw[key];
+    if (v == null || v === "") return null;
+    if (typeof v !== "string") return null;
+    const max = LIMITS[key] ?? 500;
+    return v.trim().slice(0, max) || null;
   }
 
-  // ── 2. Save to database (critical — fail the request if this fails) ──────
+  const name          = field("name");
+  const email         = field("email");
+  const company       = field("company");
+  const role          = field("role");
+  const business_type = field("business_type");
+  const business_size = field("business_size");
+  const current_tools = field("current_tools");
+  const pain_points   = field("pain_points");
+  const goals         = field("goals");
+  const timeline      = field("timeline");
+  const notes         = field("notes");
+
+  // ── 4. Validate required fields ───────────────────────────────────────────
+  if (!name) {
+    return NextResponse.json({ error: "Name is required" }, { status: 400 });
+  }
+  if (!email || !EMAIL_RE.test(email)) {
+    return NextResponse.json({ error: "A valid email address is required" }, { status: 400 });
+  }
+
+  // ── 5. Save lead (critical — form fails if DB fails) ──────────────────────
   try {
     await ensureTable();
     const sql = getSql();
     await sql`
-      INSERT INTO leads (name, email, company, role, business_type, business_size, current_tools, pain_points, goals, timeline, notes)
-      VALUES (${name}, ${email}, ${company ?? null}, ${role ?? null}, ${business_type ?? null},
-              ${business_size ?? null}, ${current_tools ?? null}, ${pain_points ?? null},
-              ${goals ?? null}, ${timeline ?? null}, ${notes ?? null})
+      INSERT INTO leads
+        (name, email, company, role, business_type, business_size,
+         current_tools, pain_points, goals, timeline, notes)
+      VALUES
+        (${name}, ${email}, ${company}, ${role}, ${business_type}, ${business_size},
+         ${current_tools}, ${pain_points}, ${goals}, ${timeline}, ${notes})
     `;
   } catch (dbErr) {
-    const msg = dbErr instanceof Error ? dbErr.message : String(dbErr);
-    console.error("[/api/quote] DB error:", msg);
-    // Surface DB errors in the response so they show up in the browser during debugging
+    console.error("[/api/quote] DB error:", dbErr instanceof Error ? dbErr.message : dbErr);
+    // Never expose DB internals to the client in production
     return NextResponse.json(
-      { error: `Database error: ${msg}` },
+      { error: "Submission failed. Please try again or email us directly." },
       { status: 500 }
     );
   }
 
-  // ── 3. Send emails (best-effort — never fail the request over email) ─────
-  const emailErrors: string[] = [];
+  // ── 6. Send emails (best-effort — lead is already saved) ─────────────────
   try {
     const resend = getResend();
 
     const { error: notifyErr } = await resend.emails.send({
       from: FROM,
       to: [NOTIFY_EMAIL],
-      subject: `New quote request from ${name}${company ? ` · ${company}` : ""}`,
+      subject: `New quote request from ${h(name)}${company ? ` · ${h(company)}` : ""}`,
       html: notifyHtml({ name, email, company, role, business_type, business_size, timeline, pain_points, goals, notes }),
     });
-    if (notifyErr) {
-      emailErrors.push(`notify: ${notifyErr.message}`);
-      console.error("[/api/quote] Resend notify error:", notifyErr.message);
-    }
+    if (notifyErr) console.error("[/api/quote] Resend notify:", notifyErr.message);
 
     const { error: confirmErr } = await resend.emails.send({
       from: FROM,
@@ -107,31 +157,23 @@ export async function POST(req: Request) {
       subject: "We received your quote request — Go-Orca.Tech",
       html: confirmHtml({ name }),
     });
-    if (confirmErr) {
-      emailErrors.push(`confirm: ${confirmErr.message}`);
-      console.error("[/api/quote] Resend confirm error:", confirmErr.message);
-    }
+    if (confirmErr) console.error("[/api/quote] Resend confirm:", confirmErr.message);
   } catch (emailErr) {
-    const msg = emailErr instanceof Error ? emailErr.message : String(emailErr);
-    emailErrors.push(`exception: ${msg}`);
-    console.error("[/api/quote] Email exception:", msg);
+    console.error("[/api/quote] Email exception:", emailErr instanceof Error ? emailErr.message : emailErr);
   }
 
-  // Lead is saved — return success even if emails had issues
-  return NextResponse.json({
-    ok: true,
-    ...(emailErrors.length > 0 && { email_warnings: emailErrors }),
-  });
+  return NextResponse.json({ ok: true });
 }
 
-// ── Email templates ──────────────────────────────────────────────────────────
+// ── Email templates ───────────────────────────────────────────────────────────
+// All user-supplied values are passed through h() before insertion into HTML.
 
 function row(label: string, value: string | null | undefined) {
   if (!value) return "";
   return `
     <tr>
       <td style="padding:8px 0;color:#94a3b8;font-size:12px;font-family:monospace;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;padding-right:24px;">${label}</td>
-      <td style="padding:8px 0;color:#f1f5f9;font-size:14px;">${value}</td>
+      <td style="padding:8px 0;color:#f1f5f9;font-size:14px;">${h(value)}</td>
     </tr>`;
 }
 
@@ -142,29 +184,29 @@ function notifyHtml(d: Record<string, string | null | undefined>) {
   <div style="max-width:560px;margin:32px auto;background:#0f0f18;border:1px solid rgba(139,92,246,0.25);border-radius:16px;overflow:hidden;">
     <div style="background:linear-gradient(135deg,#8B5CF6,#06B6D4);padding:28px 36px;">
       <div style="font-size:11px;color:rgba(255,255,255,0.7);font-family:monospace;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;">New quote request</div>
-      <div style="font-size:22px;font-weight:700;color:white;">${d.name}${d.company ? `<span style="font-weight:400;opacity:0.7;font-size:16px;"> · ${d.company}</span>` : ""}</div>
+      <div style="font-size:22px;font-weight:700;color:white;">${h(d.name)}${d.company ? `<span style="font-weight:400;opacity:0.7;font-size:16px;"> · ${h(d.company)}</span>` : ""}</div>
     </div>
     <div style="padding:32px 36px;">
       <table style="width:100%;border-collapse:collapse;">
-        ${row("Email", `<a href="mailto:${d.email}" style="color:#8B5CF6;">${d.email}</a>`)}
+        ${row("Email", d.email ? `<a href="mailto:${h(d.email)}" style="color:#8B5CF6;">${h(d.email)}</a>` : null)}
         ${row("Role", d.role)}
         ${row("Business type", d.business_type)}
         ${row("Team size", d.business_size)}
         ${row("Timeline", d.timeline)}
         ${row("Current tools", d.current_tools)}
       </table>
-      ${d.pain_points ? `<div style="margin-top:24px;border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;"><div style="font-size:11px;color:#8B5CF6;font-family:monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Pain points</div><div style="color:#cbd5e1;font-size:14px;line-height:1.7;">${d.pain_points}</div></div>` : ""}
-      ${d.goals ? `<div style="margin-top:20px;"><div style="font-size:11px;color:#8B5CF6;font-family:monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Goals</div><div style="color:#cbd5e1;font-size:14px;line-height:1.7;">${d.goals}</div></div>` : ""}
-      ${d.notes ? `<div style="margin-top:20px;"><div style="font-size:11px;color:#8B5CF6;font-family:monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Notes</div><div style="color:#cbd5e1;font-size:14px;line-height:1.7;">${d.notes}</div></div>` : ""}
-      <a href="mailto:${d.email}" style="display:block;margin-top:28px;background:linear-gradient(135deg,#8B5CF6,#06B6D4);color:white;text-decoration:none;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;font-size:15px;">Reply to ${d.name} →</a>
+      ${d.pain_points ? `<div style="margin-top:24px;border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;"><div style="font-size:11px;color:#8B5CF6;font-family:monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Pain points</div><div style="color:#cbd5e1;font-size:14px;line-height:1.7;">${h(d.pain_points)}</div></div>` : ""}
+      ${d.goals ? `<div style="margin-top:20px;"><div style="font-size:11px;color:#8B5CF6;font-family:monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Goals</div><div style="color:#cbd5e1;font-size:14px;line-height:1.7;">${h(d.goals)}</div></div>` : ""}
+      ${d.notes ? `<div style="margin-top:20px;"><div style="font-size:11px;color:#8B5CF6;font-family:monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Notes</div><div style="color:#cbd5e1;font-size:14px;line-height:1.7;">${h(d.notes)}</div></div>` : ""}
+      <a href="mailto:${h(d.email ?? "")}" style="display:block;margin-top:28px;background:linear-gradient(135deg,#8B5CF6,#06B6D4);color:white;text-decoration:none;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;font-size:15px;">Reply to ${h(d.name ?? "")} →</a>
     </div>
     <div style="padding:16px 36px;background:#080810;text-align:center;font-size:11px;color:#475569;font-family:monospace;">GO-ORCA.TECH · QUOTE SYSTEM</div>
   </div>
 </body></html>`;
 }
 
-function confirmHtml({ name }: { name: string }) {
-  const first = name.split(" ")[0];
+function confirmHtml({ name }: { name: string | null }) {
+  const first = h((name ?? "").split(" ")[0]);
   return `
 <!DOCTYPE html><html><head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
