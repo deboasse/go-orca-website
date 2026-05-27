@@ -1,4 +1,4 @@
-# Authentication — go-orca.tech
+# auth.md
 
 ## Public Access (No Auth Required)
 
