@@ -48,21 +48,6 @@ async function ensureTable() {
   `;
 }
 
-// GET /api/quote — env var presence check (no secret values exposed)
-export function GET() {
-  const dbKey =
-    process.env.GO_ORCA_DB_DATABASE_URL ? "GO_ORCA_DB_DATABASE_URL" :
-    process.env.DATABASE_URL ? "DATABASE_URL" :
-    process.env.POSTGRES_URL_NON_POOLING ? "POSTGRES_URL_NON_POOLING" :
-    process.env.POSTGRES_URL ? "POSTGRES_URL" :
-    null;
-
-  return NextResponse.json({
-    db: dbKey ? `✓ found as ${dbKey}` : "✗ missing — set GO_ORCA_DB_DATABASE_URL or DATABASE_URL",
-    resend: process.env.RESEND_API_KEY ? "✓ set" : "✗ missing — RESEND_API_KEY not found",
-    from: process.env.RESEND_FROM_EMAIL ?? "(default) Go-Orca <hello@go-orca.tech>",
-  });
-}
 
 export async function POST(req: Request) {
   // ── 1. Parse & validate ──────────────────────────────────────────────────
