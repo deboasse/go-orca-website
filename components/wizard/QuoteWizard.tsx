@@ -3,21 +3,16 @@
 import { useMemo, useState } from "react";
 import { z } from "zod";
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
 async function insertLead(payload: Record<string, unknown>) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/leads`, {
+  const res = await fetch("/api/quote", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      Prefer: "return=minimal",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) {
+    const { error } = await res.json().catch(() => ({ error: "Unknown error" }));
+    throw new Error(error ?? "Submission failed");
+  }
 }
 
 const STEPS = [
