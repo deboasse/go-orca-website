@@ -50,16 +50,53 @@ export const metadata: Metadata = {
   },
 };
 
-const organizationJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "Go-Orca.Tech",
-  url: "https://go-orca.tech",
-  logo: "https://go-orca.tech/orca-logo.png",
-  email: "hello@go-orca.tech",
-  areaServed: ["US", "FR", "HK"],
-  sameAs: ["https://go-orca.tech"],
-};
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://go-orca.tech/#organization",
+    name: "Go-Orca.Tech",
+    url: "https://go-orca.tech",
+    logo: "https://go-orca.tech/orca-logo.png",
+    email: "hello@go-orca.tech",
+    areaServed: ["US", "FR", "HK"],
+    sameAs: ["https://go-orca.tech"],
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      email: "hello@go-orca.tech",
+      availableLanguage: ["English", "Portuguese"],
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "@id": "https://go-orca.tech/#software",
+    name: "Go-Orca CRM",
+    applicationCategory: "BusinessApplication",
+    description:
+      "Custom CRM and business software platform. Purpose-built CRMs, internal dashboards, client portals, and web applications for growing businesses.",
+    url: "https://go-orca.tech",
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "USD",
+      description: "Fixed-price custom software projects. Contact for a quote.",
+    },
+    provider: { "@id": "https://go-orca.tech/#organization" },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "https://go-orca.tech/#website",
+    url: "https://go-orca.tech",
+    name: "Go-Orca.Tech",
+    publisher: { "@id": "https://go-orca.tech/#organization" },
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", "h2", ".speakable"],
+    },
+  },
+];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -67,7 +104,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
       <body>

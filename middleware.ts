@@ -248,6 +248,21 @@ export function middleware(request: NextRequest) {
     });
   }
 
+  // Agent mode — return stripped markdown for ?mode=agent
+  const mode = request.nextUrl.searchParams.get("mode");
+  if (mode === "agent") {
+    const md = MARKDOWN[pathname] ?? MARKDOWN["/"];
+    if (md) {
+      return new NextResponse(md, {
+        headers: {
+          "Content-Type": "text/markdown; charset=utf-8",
+          "X-Agent-Mode": "true",
+          "Vary": "Accept",
+        },
+      });
+    }
+  }
+
   // Serve .md suffix as explicit markdown URL (e.g. /index.md → /, /about.md → /about)
   if (pathname.endsWith(".md")) {
     const basePath = pathname === "/index.md" ? "/" : pathname.slice(0, -3);
