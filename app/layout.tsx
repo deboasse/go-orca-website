@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   description:
     "We build custom CRMs, custom apps, product development, and custom plugins & integrations for any type of business. Organize your operation the way you want, stop losing information, and put everything in one single dashboard.",
   authors: [{ name: "Go-Orca.Tech" }],
+  alternates: {
+    canonical: "https://go-orca.tech",
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },

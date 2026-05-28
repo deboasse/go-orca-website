@@ -1,33 +1,29 @@
 {
-  "$schema": "https://agentskills.io/schema/v0.2.0/index.json",
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
   "skills": [
     {
       "name": "crm-roi-calculator",
       "type": "tool",
       "description": "Calculate the ROI of switching from spreadsheets or legacy CRM to a custom Go-Orca CRM. Inputs: current_tools, team_size, hours_per_week_lost, average_hourly_rate, monthly_crm_cost. Returns estimated annual savings and ROI percentage.",
-      "url": "https://go-orca.tech/tools/crm-roi-calculator",
-      "sha256": "placeholder-will-update-on-deploy"
+      "url": "https://go-orca.tech/tools/crm-roi-calculator"
     },
     {
       "name": "cac-calculator",
       "type": "tool",
       "description": "Calculate Customer Acquisition Cost (CAC) given marketing spend and number of new customers acquired in a period.",
-      "url": "https://go-orca.tech/tools/cac-calculator",
-      "sha256": "placeholder-will-update-on-deploy"
+      "url": "https://go-orca.tech/tools/cac-calculator"
     },
     {
       "name": "crm-cost-estimator",
       "type": "tool",
       "description": "Estimate the cost of building a custom CRM. Inputs: team_size, modules_needed, integration_count, timeline. Returns cost range and build timeline estimate.",
-      "url": "https://go-orca.tech/tools/crm-cost-estimator",
-      "sha256": "placeholder-will-update-on-deploy"
+      "url": "https://go-orca.tech/tools/crm-cost-estimator"
     },
     {
       "name": "app-development-cost",
       "type": "tool",
       "description": "Estimate the cost of custom app development based on platform, feature set, and timeline.",
-      "url": "https://go-orca.tech/tools/app-development-cost",
-      "sha256": "placeholder-will-update-on-deploy"
+      "url": "https://go-orca.tech/tools/app-development-cost"
     }
   ]
 }

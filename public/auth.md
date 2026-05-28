@@ -186,11 +186,42 @@ On a 401, drop the credential and restart at Step 1.
 | `/tools/*` | GET |
 | `/api/quote` | POST |
 
+## Rate Limits
+
+| Window | Limit |
+|---|---|
+| Per IP, per minute | 60 requests |
+| Per credential, per minute | 120 requests |
+| Agent auth registration, per hour | 10 registrations |
+
+Headers returned on every response:
+
+```
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 45
+X-RateLimit-Reset: 1717200000
+```
+
+On limit exceeded: `HTTP 429`. Back off and retry after `Retry-After` seconds.
+
+## Revocation
+
+You do not initiate revocation. Two paths exist:
+
+- **Provider-driven (ID-JAG flows):** the provider that minted your ID-JAG can POST a `logout+jwt` to `https://go-orca.tech/api/agent/auth/revoke`. Your credential will be invalidated. You discover this on the next API call returning 401 — restart at Step 1.
+- **API key flows:** on a 401 for a previously-working credential, drop it and restart at Step 1.
+
 ## Errors
 
 | Code | What to do |
 |---|---|
 | 401 | Credential expired or invalid — restart at Step 1 |
 | 403 | Scope insufficient |
-| 429 | Back off and retry |
+| 429 | Rate limited — back off, retry after Retry-After |
 | 5xx | Exponential backoff, retry |
+
+## More
+
+- [API Catalog](https://go-orca.tech/.well-known/api-catalog)
+- [Agent Skills](https://go-orca.tech/.well-known/agent-skills/index.json)
+- [MCP Server Card](https://go-orca.tech/.well-known/mcp/server-card.json)

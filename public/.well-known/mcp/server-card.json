@@ -1,8 +1,11 @@
 {
+  "name": "go-orca-tools",
+  "description": "Go-Orca.Tech MCP server exposing CRM calculators and cost estimation tools for AI agents.",
+  "version": "1.0.0",
   "serverInfo": {
     "name": "go-orca-tools",
     "version": "1.0.0",
-    "description": "Go-Orca.Tech MCP server exposing marketing calculators and CRM cost estimation tools for AI agents.",
+    "description": "Go-Orca.Tech MCP server exposing CRM calculators and cost estimation tools for AI agents.",
     "homepage": "https://go-orca.tech",
     "contact": "hello@go-orca.tech"
   },

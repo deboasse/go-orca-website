@@ -1,0 +1,17 @@
+# Go-Orca Free Tools
+
+> Free business calculators and cost guides. No sign-up required, instant results.
+
+## Calculators
+
+- [CRM ROI Calculator](https://go-orca.tech/tools/crm-roi-calculator): Annual savings, payback period, 3-year ROI from switching to custom CRM
+- [CAC Calculator](https://go-orca.tech/tools/cac-calculator): Customer acquisition cost, LTV:CAC ratio, payback period
+- [CRM Cost Estimator](https://go-orca.tech/tools/crm-cost-estimator): Build cost range and timeline for custom CRM
+
+## Cost Guides
+
+- [App Development Cost 2025](https://go-orca.tech/tools/app-development-cost): MVP ($8k–$25k) to full product ($60k–$180k)
+- [Go-Orca vs HubSpot](https://go-orca.tech/tools/go-orca-vs-hubspot): Custom CRM vs HubSpot for teams of 5–50
+- [Go-Orca vs Salesforce](https://go-orca.tech/tools/go-orca-vs-salesforce): When to switch from Salesforce
+- [Spreadsheet vs CRM](https://go-orca.tech/tools/spreadsheet-vs-crm): When spreadsheets stop working
+- [Custom vs Off-the-Shelf](https://go-orca.tech/tools/custom-vs-off-the-shelf): Build vs buy decision framework

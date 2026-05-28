@@ -1,0 +1,35 @@
+# Go-Orca.Tech
+
+> Custom CRM and software development for growing businesses. Purpose-built systems, not generic templates.
+
+Go-Orca.Tech is a software development agency based in Massachusetts, USA. We build custom CRMs, internal dashboards, client portals, and web applications for small and mid-sized businesses. Fixed-price projects, 6-week average deployment, no hourly billing.
+
+## Documentation
+
+- [Agent Auth Guide](https://go-orca.tech/auth.md): OAuth flows, agent registration, scopes
+- [API Catalog](https://go-orca.tech/.well-known/api-catalog): Available API endpoints (RFC 9727)
+- [Agent Skills](https://go-orca.tech/.well-known/agent-skills/index.json): Agent-callable tools index
+- [OpenAPI Spec](https://go-orca.tech/openapi.json): Machine-readable API specification
+
+## Services
+
+- [Homepage](https://go-orca.tech/): Custom CRM, apps, product development, plugins & integrations
+- [About](https://go-orca.tech/about): Agency background, team, named clients
+- [Contact / Get a Quote](https://go-orca.tech/contact): Fixed-price project quotes — 1 business day response
+
+## Free Tools
+
+- [CRM ROI Calculator](https://go-orca.tech/tools/crm-roi-calculator): Calculate annual savings and payback period
+- [CAC Calculator](https://go-orca.tech/tools/cac-calculator): Customer acquisition cost calculator
+- [CRM Cost Estimator](https://go-orca.tech/tools/crm-cost-estimator): Custom CRM build cost ranges
+- [App Development Cost Guide](https://go-orca.tech/tools/app-development-cost): 2025 cost ranges for web and mobile apps
+- [Go-Orca vs HubSpot](https://go-orca.tech/tools/go-orca-vs-hubspot): Side-by-side comparison
+- [Go-Orca vs Salesforce](https://go-orca.tech/tools/go-orca-vs-salesforce): When to switch
+- [Spreadsheet vs CRM](https://go-orca.tech/tools/spreadsheet-vs-crm): Decision framework
+- [Custom vs Off-the-Shelf](https://go-orca.tech/tools/custom-vs-off-the-shelf): Build vs buy guide
+
+## Legal & Trust
+
+- [FAQ](https://go-orca.tech/faq): Pricing, timelines, ownership, and process
+- [Privacy Policy](https://go-orca.tech/privacy): Data handling
+- [Terms of Service](https://go-orca.tech/terms): Service agreement

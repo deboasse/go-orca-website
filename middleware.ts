@@ -34,6 +34,7 @@ Allow: /
 Content-Signal: ai-train=no, search=yes, ai-input=no
 
 Sitemap: https://go-orca.tech/sitemap.xml
+Schemamap: https://go-orca.tech/schemamap.xml
 `;
 
 // Static markdown for key pages — returned when Accept: text/markdown
@@ -247,6 +248,22 @@ export function middleware(request: NextRequest) {
     });
   }
 
+  // Serve .md suffix as explicit markdown URL (e.g. /index.md → /, /about.md → /about)
+  if (pathname.endsWith(".md")) {
+    const basePath = pathname === "/index.md" ? "/" : pathname.slice(0, -3);
+    const md = MARKDOWN[basePath];
+    if (md) {
+      const wordCount = md.split(/\s+/).length;
+      return new NextResponse(md, {
+        headers: {
+          "Content-Type": "text/markdown; charset=utf-8",
+          "Vary": "Accept",
+          "x-markdown-tokens": String(wordCount),
+        },
+      });
+    }
+  }
+
   // Markdown content negotiation for AI agents
   // Spec: https://developers.cloudflare.com/fundamentals/reference/markdown-for-agents/
   const accept = request.headers.get("accept") ?? "";
@@ -271,9 +288,13 @@ export const config = {
   matcher: [
     "/robots.txt",
     "/",
+    "/index.md",
     "/about",
+    "/about.md",
     "/tools",
+    "/tools.md",
     "/tools/:path*",
     "/contact",
+    "/contact.md",
   ],
 };

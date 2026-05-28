@@ -2,24 +2,35 @@
   "linkset": [
     {
       "anchor": "https://go-orca.tech",
+      "item": [
+        {
+          "href": "https://go-orca.tech/api/leads",
+          "type": "application/json",
+          "title": "Leads API — Read and update CRM pipeline leads"
+        },
+        {
+          "href": "https://go-orca.tech/api/agent/auth",
+          "type": "application/json",
+          "title": "Agent Auth — Anonymous and identity-assertion registration"
+        },
+        {
+          "href": "https://go-orca.tech/api/quote",
+          "type": "application/json",
+          "title": "Quote API — Submit a custom software quote request"
+        }
+      ],
       "service-desc": [
         {
-          "href": "https://go-orca.tech/.well-known/openapi.json",
-          "type": "application/json",
-          "title": "Go-Orca Public API"
+          "href": "https://go-orca.tech/auth.md",
+          "type": "text/markdown",
+          "title": "Agent Authentication Guide"
         }
       ],
       "service-doc": [
         {
-          "href": "https://go-orca.tech/tools",
-          "type": "text/html",
-          "title": "Go-Orca Tools & Calculators"
-        }
-      ],
-      "status": [
-        {
-          "href": "https://go-orca.tech/api/health",
-          "type": "application/json"
+          "href": "https://go-orca.tech/auth.md",
+          "type": "text/markdown",
+          "title": "Agent Authentication Guide"
         }
       ]
     }

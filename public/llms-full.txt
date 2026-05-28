@@ -1,0 +1,135 @@
+# Go-Orca.Tech — Full Content Index
+
+> Custom CRM and software development for growing businesses. Purpose-built systems, not generic templates.
+
+Go-Orca.Tech is a software development agency based in Massachusetts, USA. We build custom CRMs, internal dashboards, client portals, and web applications for small and mid-sized businesses. Fixed-price projects, 6-week average deployment, no hourly billing.
+
+---
+
+## Homepage — go-orca.tech
+
+Go-Orca builds custom CRM software, internal tools, and web applications for small and mid-sized businesses that have outgrown spreadsheets and off-the-shelf SaaS.
+
+### Services
+
+**Custom CRM** — A CRM shaped to your business, your pipeline, your fields, one dashboard. Not a forced template.
+- Tailored to your workflow
+- Unified contacts & inbox
+- Live reports & automations
+
+**Custom Apps** — Web and mobile apps built around how you actually work: internal tools, client portals, dashboards.
+- Web & mobile apps
+- Internal tools & portals
+- Auth, billing, file storage
+
+**Product Development** — From idea to launch: discovery, design, engineering, and iteration to ship a real product.
+- Discovery & UX design
+- Full-stack engineering
+- MVP build & iteration
+
+**Plugins & Integrations** — Bespoke plugins and integrations that connect everything you already use.
+- WordPress, Shopify, Chrome
+- CRM & ERP integrations
+- Webhooks & automations
+
+### How It Works
+
+1. **Listen** — We learn how your business actually runs, your customers, your stages, your headaches.
+2. **Design** — We model your CRM around your workflow. You approve before we build.
+3. **Build** — Two-week sprints, demoed live. Your team starts using a real CRM in weeks, not quarters.
+4. **Grow** — We stay on as your partner, adding modules, automations and new dashboards as your business evolves.
+
+### Past Clients
+
+- De'Angele Group — technical marketing operations, 4+ year partnership
+- Premier Fence Wholesale — custom wholesale website and martech stack
+- Bux Diamantaire — custom inventory, client, and sales management app
+- Private Capital Co. — multi-project finance software (NDA)
+- Private Healthcare Agency — 8+ month engagement (NDA)
+
+Contact: hello@go-orca.tech | Massachusetts, USA | [Get a quote](https://go-orca.tech/contact)
+
+---
+
+## About — go-orca.tech/about
+
+Go-Orca is a software development agency based in Massachusetts, USA. We build custom CRM systems, internal tools, and web applications for fast-paced businesses across the US, France, and Hong Kong.
+
+We replace spreadsheets and off-the-shelf SaaS tools with custom software built precisely around your workflow — so your team spends less time on manual data entry and more time on work that grows the business.
+
+**Founded by:** Vinny Deboasse and Natalia. Based in Massachusetts, USA.
+
+---
+
+## Contact — go-orca.tech/contact
+
+Request a custom quote for your software project.
+
+**Email:** hello@go-orca.tech
+**Location:** Massachusetts, USA
+**Response time:** One business day
+
+What happens after you submit:
+1. A founder personally reviews your answers
+2. We prepare a custom scope and quote
+3. We schedule a 20-minute walkthrough call
+
+---
+
+## Agent Authentication — go-orca.tech/auth.md
+
+Agents may authenticate via the OAuth 2.0 client credentials flow. Anonymous and identity-assertion registration are supported.
+
+**Register URI:** https://go-orca.tech/api/agent/auth
+**Scopes:** leads:read, leads:write
+**Documentation:** https://go-orca.tech/auth.md
+
+---
+
+## Free Tools — go-orca.tech/tools
+
+### CRM ROI Calculator
+Calculate annual savings from replacing spreadsheets or off-the-shelf SaaS with a custom CRM.
+- Input: team size, hours lost/week, hourly rate, monthly SaaS cost, investment
+- Output: annual savings, ROI %, payback period, 3-year net return
+- URL: https://go-orca.tech/tools/crm-roi-calculator
+
+### Customer Acquisition Cost (CAC) Calculator
+Calculate true CAC from marketing and sales spend.
+- Input: total marketing + sales spend, new customers acquired
+- Output: CAC, LTV:CAC ratio, payback period
+- URL: https://go-orca.tech/tools/cac-calculator
+
+### Custom CRM Cost Estimator
+Estimate the cost to build a custom CRM.
+- Input: team size, modules, integrations, timeline
+- Typical ranges: 5–10 people ($15k–$30k), 10–30 people ($25k–$55k), 30+ people ($45k–$80k+)
+- URL: https://go-orca.tech/tools/crm-cost-estimator
+
+### App Development Cost Guide 2025
+Real cost ranges for web and mobile apps.
+- MVP / Prototype: $8k–$25k (2–5 weeks)
+- Web App (internal): $15k–$45k (4–10 weeks)
+- Customer-facing web app: $25k–$75k (6–14 weeks)
+- Mobile app (iOS + Android): $35k–$100k (8–20 weeks)
+- Full product (web + mobile): $60k–$180k (14–28 weeks)
+- URL: https://go-orca.tech/tools/app-development-cost
+
+---
+
+## API Reference
+
+**Base URL:** https://go-orca.tech
+
+| Endpoint | Method | Auth | Description |
+|---|---|---|---|
+| /api/agent/auth | POST | None | Register agent, get API key |
+| /api/agent/auth/claim | POST | None | Trigger claim email |
+| /api/agent/auth/claim/complete | POST | None | Submit OTP, get credential |
+| /api/leads | GET | Bearer | List CRM leads |
+| /api/leads | PATCH | Bearer | Update lead status |
+| /api/quote | POST | None | Submit quote request |
+
+**Scopes:** leads:read (read pipeline), leads:write (update status/notes)
+
+Full auth documentation: https://go-orca.tech/auth.md
