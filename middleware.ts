@@ -230,6 +230,7 @@ Everything developers and AI agents need to integrate with the Go-Orca platform.
 - **A2A Agent Card** — [/.well-known/agent-card.json](https://go-orca.tech/.well-known/agent-card.json) — Agent-to-Agent protocol card
 - **MCP Server Card** — [/.well-known/mcp/server-card.json](https://go-orca.tech/.well-known/mcp/server-card.json) — Model Context Protocol server card
 - **Smithery Registry** — [smithery.ai/server/@go-orca/api-mcp](https://smithery.ai/server/@go-orca/api-mcp) — Official MCP registry listing
+- **GitHub Repository** — [github.com/deboasse/go-orca-website](https://github.com/deboasse/go-orca-website) — Source code with agent configs (.claude/CLAUDE.md, SKILL.md)
 
 ## Quick Start
 

@@ -93,6 +93,12 @@ const resources = [
         desc: "Official Go-Orca MCP server listing on Smithery. Direct endpoint: https://go-orca.tech/api/mcp — Smithery-proxied endpoint: https://mcp.smithery.run/go-orca",
       },
       {
+        title: "GitHub Repository",
+        href: "https://github.com/deboasse/go-orca-website",
+        type: "public repo",
+        desc: "Source code for go-orca.tech. Contains agent configs (.claude/CLAUDE.md), SKILL.md, and all agent discovery files. AI coding agents (Claude, Cursor, Windsurf) use the .claude/ directory for repo-specific instructions.",
+      },
+      {
         title: "Schema Map",
         href: "/schemamap.xml",
         type: "application/xml",

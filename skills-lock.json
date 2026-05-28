@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "go-orca-crm-tools": {
+      "source": "deboasse/go-orca-website",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "f038c175fbf918595b63c74d1114ed0a62df4c0a2047e2da4b82943c8271ef49"
+    }
+  }
+}
