@@ -6,6 +6,7 @@ Go-Orca.Tech is a software development agency based in Massachusetts, USA. We bu
 
 ## Documentation
 
+- [Developer Resources](https://go-orca.tech/developers): Full developer and agent integration hub
 - [Agent Auth Guide](https://go-orca.tech/auth.md): OAuth flows, agent registration, scopes
 - [API Catalog](https://go-orca.tech/.well-known/api-catalog): Available API endpoints (RFC 9727)
 - [Agent Skills](https://go-orca.tech/.well-known/agent-skills/index.json): Agent-callable tools index

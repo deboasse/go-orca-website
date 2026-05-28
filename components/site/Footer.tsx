@@ -59,6 +59,7 @@ export function Footer() {
           <Col
             title="Developers"
             links={[
+              { href: "/developers", label: "Developer resources" },
               { href: "/auth.md", label: "Auth guide" },
               { href: "/openapi.json", label: "OpenAPI spec" },
               { href: "/.well-known/agent-skills/index.json", label: "Agent skills" },

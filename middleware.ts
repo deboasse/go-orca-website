@@ -210,6 +210,53 @@ Free tool to estimate the cost of building a custom CRM for your business.
 [Try the estimator](https://go-orca.tech/tools/crm-cost-estimator) | [Get a fixed-price quote](https://go-orca.tech/contact)
 `,
 
+  "/developers": `# Go-Orca Developer & Agent Resources
+
+Everything developers and AI agents need to integrate with the Go-Orca platform.
+
+## API Reference
+- **OpenAPI 3.1 Spec** — [/openapi.json](https://go-orca.tech/openapi.json) — Full machine-readable spec with agent auth, leads API, and quote endpoint
+- **API Catalog** — [/.well-known/api-catalog](https://go-orca.tech/.well-known/api-catalog) — RFC 9727-compliant service description catalog
+
+## Agent Auth
+- **Auth Guide** — [/auth.md](https://go-orca.tech/auth.md) — Full flow: discover → register → claim → use → revoke. Supports anonymous, id-jag, and email identity_assertion.
+- **OAuth Authorization Server** — [/.well-known/oauth-authorization-server](https://go-orca.tech/.well-known/oauth-authorization-server) — RFC 8414 + agent_auth extension
+- **OAuth Protected Resource** — [/.well-known/oauth-protected-resource](https://go-orca.tech/.well-known/oauth-protected-resource) — RFC 9728
+
+## Agent Discovery
+- **llms.txt** — [/llms.txt](https://go-orca.tech/llms.txt) — Services, tools, and links for LLM context injection
+- **llms-full.txt** — [/llms-full.txt](https://go-orca.tech/llms-full.txt) — Full site content dump for agent context
+- **Agent Skills** — [/.well-known/agent-skills/index.json](https://go-orca.tech/.well-known/agent-skills/index.json) — agentskills.io v0.2.0 discovery
+- **A2A Agent Card** — [/.well-known/agent-card.json](https://go-orca.tech/.well-known/agent-card.json) — Agent-to-Agent protocol card
+- **MCP Server Card** — [/.well-known/mcp/server-card.json](https://go-orca.tech/.well-known/mcp/server-card.json) — Model Context Protocol server card
+
+## Quick Start
+
+### Anonymous registration (no identity required)
+\`\`\`http
+POST https://go-orca.tech/api/agent/auth
+Content-Type: application/json
+
+{ "identity_type": "anonymous" }
+\`\`\`
+Returns: \`{ "credential": "<api_key>", "type": "api_key", "expires_in": 86400 }\`
+
+### Use credential on protected routes
+\`\`\`http
+GET https://go-orca.tech/api/leads
+Authorization: Bearer <api_key>
+\`\`\`
+
+## Rate Limits
+- Per IP: 60 req/min
+- Per credential: 120 req/min
+- Agent registrations: 10/hr per IP
+- Headers: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+
+## Contact
+[hello@go-orca.tech](mailto:hello@go-orca.tech) | [go-orca.tech/contact](https://go-orca.tech/contact)
+`,
+
   "/tools/app-development-cost": `# Custom App Development Cost Guide 2025 — Go-Orca.Tech
 
 Real cost ranges for building custom web and mobile apps in 2025, based on Go-Orca's actual project history.
@@ -306,6 +353,8 @@ export const config = {
     "/index.md",
     "/about",
     "/about.md",
+    "/developers",
+    "/developers.md",
     "/tools",
     "/tools.md",
     "/tools/:path*",
