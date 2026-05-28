@@ -22,6 +22,7 @@
   "tags": [
     { "name": "auth", "description": "Agent authentication and registration" },
     { "name": "leads", "description": "CRM lead pipeline (requires authentication)" },
+    { "name": "mcp", "description": "Model Context Protocol endpoint (JSON-RPC 2.0)" },
     { "name": "public", "description": "Public endpoints — no authentication required" }
   ],
   "paths": {
@@ -247,6 +248,90 @@
           },
           "400": { "$ref": "#/components/responses/BadRequest" },
           "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      }
+    }
+    },
+    "/api/mcp": {
+      "get": {
+        "operationId": "mcpDiscover",
+        "summary": "MCP server discovery",
+        "description": "Returns the MCP server info, capabilities, and tool list without requiring a JSON-RPC request. Useful for automated discovery.",
+        "tags": ["mcp"],
+        "responses": {
+          "200": {
+            "description": "MCP server metadata",
+            "headers": {
+              "X-MCP-Version": { "schema": { "type": "string" }, "example": "2024-11-05" },
+              "X-MCP-Server": { "schema": { "type": "string" }, "example": "go-orca-tools" }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "protocol": { "type": "string" },
+                    "protocolVersion": { "type": "string" },
+                    "serverInfo": { "type": "object", "properties": { "name": { "type": "string" }, "version": { "type": "string" } } },
+                    "capabilities": { "type": "object" },
+                    "toolCount": { "type": "integer" },
+                    "tools": { "type": "array", "items": { "type": "object" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "mcpJsonRpc",
+        "summary": "MCP JSON-RPC 2.0 endpoint",
+        "description": "Model Context Protocol endpoint. Supports methods: initialize, notifications/initialized, ping, tools/list, tools/call. Tools: calculate_crm_roi, estimate_crm_cost, get_quote_url.",
+        "tags": ["mcp"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["jsonrpc", "method"],
+                "properties": {
+                  "jsonrpc": { "type": "string", "const": "2.0" },
+                  "id": { "type": ["string", "number", "null"] },
+                  "method": { "type": "string", "enum": ["initialize", "notifications/initialized", "ping", "tools/list", "tools/call"] },
+                  "params": { "type": "object" }
+                },
+                "example": {
+                  "jsonrpc": "2.0",
+                  "id": 1,
+                  "method": "initialize",
+                  "params": { "protocolVersion": "2024-11-05", "capabilities": {}, "clientInfo": { "name": "my-agent", "version": "1.0.0" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "JSON-RPC 2.0 response",
+            "headers": {
+              "X-MCP-Version": { "schema": { "type": "string" } },
+              "X-MCP-Server": { "schema": { "type": "string" } }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "jsonrpc": { "type": "string" },
+                    "id": { "type": ["string", "number", "null"] },
+                    "result": { "type": "object" },
+                    "error": { "type": "object", "properties": { "code": { "type": "integer" }, "message": { "type": "string" } } }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
