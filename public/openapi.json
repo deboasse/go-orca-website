@@ -250,7 +250,6 @@
           "429": { "$ref": "#/components/responses/RateLimited" }
         }
       }
-    }
     },
     "/api/mcp": {
       "get": {

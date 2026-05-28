@@ -120,6 +120,9 @@ Real cost ranges for web and mobile apps.
 ## API Reference
 
 **Base URL:** https://go-orca.tech
+**OpenAPI Spec:** https://go-orca.tech/openapi.json
+**Developer Hub:** https://go-orca.tech/developers
+**MCP Endpoint:** https://go-orca.tech/api/mcp
 
 | Endpoint | Method | Auth | Description |
 |---|---|---|---|
@@ -129,7 +132,112 @@ Real cost ranges for web and mobile apps.
 | /api/leads | GET | Bearer | List CRM leads |
 | /api/leads | PATCH | Bearer | Update lead status |
 | /api/quote | POST | None | Submit quote request |
+| /api/mcp | GET | None | MCP server discovery |
+| /api/mcp | POST | None | MCP JSON-RPC 2.0 |
 
 **Scopes:** leads:read (read pipeline), leads:write (update status/notes)
 
 Full auth documentation: https://go-orca.tech/auth.md
+
+### Quick Start Code Examples
+
+#### Step 1: Register an anonymous agent credential
+
+```bash
+curl -s -X POST https://go-orca.tech/api/agent/auth \
+  -H "Content-Type: application/json" \
+  -d '{"identity_type": "anonymous"}' | jq .
+```
+
+Response:
+```json
+{
+  "credential": "oa_live_abc123...",
+  "type": "api_key",
+  "expires_in": 86400,
+  "scopes": ["leads:read"]
+}
+```
+
+#### Step 2: List CRM leads
+
+```bash
+curl -s https://go-orca.tech/api/leads \
+  -H "Authorization: Bearer oa_live_abc123..." | jq .leads[0]
+```
+
+#### Step 3: Update a lead status
+
+```bash
+curl -s -X PATCH https://go-orca.tech/api/leads \
+  -H "Authorization: Bearer oa_live_abc123..." \
+  -H "Content-Type: application/json" \
+  -d '{"id": "lead_123", "status": "contacted", "notes": "Spoke with founder, interested in CRM."}'
+```
+
+#### MCP: Initialize and list tools
+
+```bash
+# Initialize
+curl -s -X POST https://go-orca.tech/api/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"my-agent","version":"1.0.0"}}}'
+
+# List tools
+curl -s -X POST https://go-orca.tech/api/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
+```
+
+#### MCP: Calculate CRM ROI
+
+```bash
+curl -s -X POST https://go-orca.tech/api/mcp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 3,
+    "method": "tools/call",
+    "params": {
+      "name": "calculate_crm_roi",
+      "arguments": {
+        "team_size": 10,
+        "hours_per_week_lost": 5,
+        "average_hourly_rate": 60,
+        "monthly_tool_costs": 500,
+        "crm_investment": 30000
+      }
+    }
+  }'
+```
+
+#### Submit a quote request
+
+```bash
+curl -s -X POST https://go-orca.tech/api/quote \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Jane Smith",
+    "email": "jane@company.com",
+    "company": "Acme Corp",
+    "description": "Need a custom CRM for 15-person sales team with Salesforce integration.",
+    "team_size": 15,
+    "budget": "$25,000-$50,000",
+    "timeline": "3 months"
+  }'
+```
+
+### Error Responses
+
+All API errors return JSON:
+
+```json
+{
+  "error": "unauthorized",
+  "message": "Authentication required. Obtain a credential via /api/agent/auth."
+}
+```
+
+Common error codes: `unauthorized` (401), `invalid_token` (401), `missing_field` (400), `invalid_value` (400), `not_found` (404), `database_error` (500)
+
+Rate limits: 60 req/min per IP, 120 req/min per credential. Returns 429 with `Retry-After` header.

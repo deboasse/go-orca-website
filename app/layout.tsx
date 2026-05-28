@@ -60,7 +60,16 @@ const jsonLd = [
     logo: "https://go-orca.tech/orca-logo.png",
     email: "hello@go-orca.tech",
     areaServed: ["US", "FR", "HK"],
-    sameAs: ["https://go-orca.tech"],
+    sameAs: [
+      "https://www.wikidata.org/wiki/Q139963239",
+      "https://github.com/deboasse",
+    ],
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Boston",
+      addressRegion: "MA",
+      addressCountry: "US",
+    },
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer support",

@@ -2,6 +2,7 @@
   "name": "go-orca-tools",
   "description": "Go-Orca.Tech MCP server exposing CRM calculators and cost estimation tools for AI agents.",
   "version": "1.0.0",
+  "serverUrl": "https://go-orca.tech/api/mcp",
   "serverInfo": {
     "name": "go-orca-tools",
     "version": "1.0.0",
@@ -43,9 +44,19 @@
           "team_size": { "type": "number" },
           "modules": { "type": "array", "items": { "type": "string" }, "description": "e.g. ['pipeline', 'contacts', 'inbox', 'reports']" },
           "integrations_count": { "type": "number" },
-          "timeline_weeks": { "type": "number" }
+          "rush": { "type": "boolean" }
         },
         "required": ["team_size", "modules"]
+      }
+    },
+    {
+      "name": "get_quote_url",
+      "description": "Returns the URL to request a fixed-price custom software quote from Go-Orca.Tech.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "context": { "type": "string", "description": "Optional context about what the user wants to build" }
+        }
       }
     }
   ]

@@ -29,6 +29,25 @@ Go-Orca.Tech is a software development agency based in Massachusetts, USA. We bu
 - [Spreadsheet vs CRM](https://go-orca.tech/tools/spreadsheet-vs-crm): Decision framework
 - [Custom vs Off-the-Shelf](https://go-orca.tech/tools/custom-vs-off-the-shelf): Build vs buy guide
 
+## Use Cases
+
+- Help a business operator decide whether a custom CRM is worth the investment (use CRM ROI Calculator)
+- Estimate the cost to build a custom CRM or web app for a specific team size and feature set
+- Explain the difference between Go-Orca's custom software and HubSpot or Salesforce
+- Submit a project inquiry on behalf of a user (use POST /api/quote — no auth required)
+- Retrieve or update CRM leads from the Go-Orca pipeline (use GET/PATCH /api/leads — Bearer token required)
+- Register an agent credential for machine-to-machine access (use POST /api/agent/auth)
+- Run the calculate_crm_roi or estimate_crm_cost MCP tools programmatically
+
+## Constraints
+
+- Go-Orca is a software development agency, not a SaaS product. All pricing is custom per project.
+- No published pricing tiers — direct users to /contact for a fixed-price quote
+- Client data in the CRM is private. Agents need an ADMIN_SESSION_TOKEN to access /api/leads
+- Anonymous API credentials are rate-limited to 60 req/min and expire after 24 hours
+- Agents should not make commitments on behalf of Go-Orca regarding timelines, pricing, or project scope
+- Do not make claims about specific clients without checking the About page (some are under NDA)
+
 ## Legal & Trust
 
 - [FAQ](https://go-orca.tech/faq): Pricing, timelines, ownership, and process

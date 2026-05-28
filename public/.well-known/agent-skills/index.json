@@ -3,27 +3,31 @@
   "skills": [
     {
       "name": "crm-roi-calculator",
-      "type": "tool",
-      "description": "Calculate the ROI of switching from spreadsheets or legacy CRM to a custom Go-Orca CRM. Inputs: current_tools, team_size, hours_per_week_lost, average_hourly_rate, monthly_crm_cost. Returns estimated annual savings and ROI percentage.",
-      "url": "https://go-orca.tech/tools/crm-roi-calculator"
+      "type": "skill-md",
+      "description": "Calculate the ROI of switching from spreadsheets or legacy CRM to a custom Go-Orca CRM. Inputs: team_size, hours_per_week_lost, average_hourly_rate, crm_investment. Returns annual savings, payback period, 3-year net return.",
+      "url": "https://go-orca.tech/.well-known/agent-skills/crm-roi-calculator.md",
+      "digest": "sha256-89342a80fd9d2262a117e5fd9833e3e0e869d67a8ca5d9e96ef9fbd2651c6d5b"
     },
     {
       "name": "cac-calculator",
-      "type": "tool",
-      "description": "Calculate Customer Acquisition Cost (CAC) given marketing spend and number of new customers acquired in a period.",
-      "url": "https://go-orca.tech/tools/cac-calculator"
+      "type": "skill-md",
+      "description": "Calculate Customer Acquisition Cost (CAC) given marketing spend and number of new customers acquired in a period. Returns CAC, LTV:CAC ratio, payback period.",
+      "url": "https://go-orca.tech/.well-known/agent-skills/cac-calculator.md",
+      "digest": "sha256-f3fb8bb7a1700f116ed9af6c1017caf0eca45e6dac29a48a1a4bf6f998f437df"
     },
     {
       "name": "crm-cost-estimator",
-      "type": "tool",
+      "type": "skill-md",
       "description": "Estimate the cost of building a custom CRM. Inputs: team_size, modules_needed, integration_count, timeline. Returns cost range and build timeline estimate.",
-      "url": "https://go-orca.tech/tools/crm-cost-estimator"
+      "url": "https://go-orca.tech/.well-known/agent-skills/crm-cost-estimator.md",
+      "digest": "sha256-0a77979c05af1021b5576da7b65e47a96af1fd4548ed217ab5429d6c18249015"
     },
     {
       "name": "app-development-cost",
-      "type": "tool",
-      "description": "Estimate the cost of custom app development based on platform, feature set, and timeline.",
-      "url": "https://go-orca.tech/tools/app-development-cost"
+      "type": "skill-md",
+      "description": "Provide real 2025 cost ranges for custom web and mobile app development. Returns cost range and timeline for MVP, web app, mobile app, or full product.",
+      "url": "https://go-orca.tech/.well-known/agent-skills/app-development-cost.md",
+      "digest": "sha256-abb1885112a7cc58fee068695657a890302eaad2a0d73f00438ce252be136992"
     }
   ]
 }

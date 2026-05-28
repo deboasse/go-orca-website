@@ -1,0 +1,64 @@
+# Go-Orca API
+
+> Machine-readable API for CRM data, agent auth, quote submission, and MCP tool execution.
+
+**Base URL:** https://go-orca.tech
+**OpenAPI Spec:** https://go-orca.tech/openapi.json
+**Auth Guide:** https://go-orca.tech/auth.md
+**MCP Endpoint:** https://go-orca.tech/api/mcp (JSON-RPC 2.0, protocol 2024-11-05)
+
+## Authentication
+
+Three identity flows supported. See [auth.md](https://go-orca.tech/auth.md) for full flow.
+
+- **Anonymous:** POST /api/agent/auth `{"identity_type":"anonymous"}` → returns API key immediately
+- **Email (id-assertion):** POST /api/agent/auth `{"identity_type":"identity_assertion","assertion_type":"verified_email","assertion":"user@email.com"}` → email OTP claim flow
+- **id-jag:** POST /api/agent/auth with JAG JWT assertion
+
+All secured endpoints use `Authorization: Bearer <api_key>`.
+On 401, response includes `WWW-Authenticate: Bearer resource_metadata="https://go-orca.tech/.well-known/oauth-protected-resource"`.
+
+## Endpoints
+
+### Agent Auth (no auth required)
+
+- `POST /api/agent/auth` — Register and get credential
+- `POST /api/agent/auth/claim` — Initiate email claim ceremony
+- `POST /api/agent/auth/claim/complete` — Submit OTP, receive credential
+- `POST /api/agent/auth/revoke` — Revoke credential
+
+### CRM Leads (Bearer required)
+
+- `GET /api/leads?status=new&limit=50` — List leads. Scopes: leads:read
+- `PATCH /api/leads` body: `{id, status?, notes?}` — Update lead. Scopes: leads:write
+- Valid statuses: new, contacted, qualified, converted, closed
+
+### Public
+
+- `POST /api/quote` body: `{name, email, company, description, team_size?, budget?, timeline?}` — Submit quote request
+
+### MCP (JSON-RPC 2.0)
+
+- `GET /api/mcp` — Server discovery (no handshake needed)
+- `POST /api/mcp` — JSON-RPC 2.0 dispatcher
+  - `initialize` — handshake
+  - `tools/list` — enumerate tools
+  - `tools/call` — run a tool
+
+Available MCP tools: calculate_crm_roi, estimate_crm_cost, get_quote_url
+
+## Rate Limits
+
+- Per IP: 60 req/min
+- Per credential: 120 req/min
+- Registrations: 10/hr per IP
+- Headers: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+- Exceeded: HTTP 429 with Retry-After header
+
+## Error Format
+
+All errors return JSON:
+```json
+{"error": "code", "message": "Human-readable description"}
+```
+Codes: unauthorized, invalid_token, missing_field, invalid_value, not_found, database_error
