@@ -87,6 +87,12 @@ const resources = [
         desc: "Model Context Protocol server card. Describes the MCP endpoint name, version, and capabilities for MCP-compatible AI clients.",
       },
       {
+        title: "Smithery Registry Listing",
+        href: "https://smithery.ai/server/@go-orca/api-mcp",
+        type: "MCP registry",
+        desc: "Official Go-Orca MCP server listing on Smithery. Install directly from the registry or use the serverUrl https://go-orca.tech/api/mcp for direct JSON-RPC 2.0 access.",
+      },
+      {
         title: "Schema Map",
         href: "/schemamap.xml",
         type: "application/xml",

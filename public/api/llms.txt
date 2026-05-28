@@ -6,6 +6,7 @@
 **OpenAPI Spec:** https://go-orca.tech/openapi.json
 **Auth Guide:** https://go-orca.tech/auth.md
 **MCP Endpoint:** https://go-orca.tech/api/mcp (JSON-RPC 2.0, protocol 2024-11-05)
+**MCP Registry:** https://smithery.ai/server/@go-orca/api-mcp
 
 ## Authentication
 

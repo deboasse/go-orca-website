@@ -229,6 +229,7 @@ Everything developers and AI agents need to integrate with the Go-Orca platform.
 - **Agent Skills** — [/.well-known/agent-skills/index.json](https://go-orca.tech/.well-known/agent-skills/index.json) — agentskills.io v0.2.0 discovery
 - **A2A Agent Card** — [/.well-known/agent-card.json](https://go-orca.tech/.well-known/agent-card.json) — Agent-to-Agent protocol card
 - **MCP Server Card** — [/.well-known/mcp/server-card.json](https://go-orca.tech/.well-known/mcp/server-card.json) — Model Context Protocol server card
+- **Smithery Registry** — [smithery.ai/server/@go-orca/api-mcp](https://smithery.ai/server/@go-orca/api-mcp) — Official MCP registry listing
 
 ## Quick Start
 

@@ -123,6 +123,7 @@ Real cost ranges for web and mobile apps.
 **OpenAPI Spec:** https://go-orca.tech/openapi.json
 **Developer Hub:** https://go-orca.tech/developers
 **MCP Endpoint:** https://go-orca.tech/api/mcp
+**MCP Registry (Smithery):** https://smithery.ai/server/@go-orca/api-mcp
 
 | Endpoint | Method | Auth | Description |
 |---|---|---|---|
