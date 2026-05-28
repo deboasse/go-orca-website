@@ -13,6 +13,14 @@ export const metadata: Metadata = {
   description:
     "We build custom CRMs, custom apps, product development, and custom plugins & integrations for any type of business. Organize your operation the way you want, stop losing information, and put everything in one single dashboard.",
   authors: [{ name: "Go-Orca.Tech" }],
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/orca-logo.png", type: "image/png" },
+    ],
+    apple: [{ url: "/orca-logo.png" }],
+    shortcut: "/favicon.ico",
+  },
   openGraph: {
     type: "website",
     siteName: "Go-Orca.Tech",
@@ -39,9 +47,26 @@ export const metadata: Metadata = {
   },
 };
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Go-Orca.Tech",
+  url: "https://go-orca.tech",
+  logo: "https://go-orca.tech/orca-logo.png",
+  email: "hello@go-orca.tech",
+  areaServed: ["US", "FR", "HK"],
+  sameAs: ["https://go-orca.tech"],
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+      </head>
       <body>
         <div className="flex min-h-screen flex-col bg-background">
           <WebMCPProvider />
