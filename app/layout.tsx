@@ -111,6 +111,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
+        {/* WebMCP — browser-native MCP tool registration */}
+        <meta name="mcp-server" content="https://go-orca.tech/api/mcp" />
+        <meta name="mcp-tools" content="calculate_crm_roi,estimate_crm_cost,get_quote_url" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

@@ -312,6 +312,56 @@ export default function Home() {
           </Link>
         </div>
       </section>
+
+      {/* FAQ / comparison */}
+      <section className="border-t border-border bg-surface/40">
+        <div className="mx-auto max-w-4xl px-6 py-20 md:py-28">
+          <p className="inline-block font-mono text-[10px] uppercase tracking-[0.3em] bg-[oklch(0.38_0.27_295)] text-white px-1.5 py-px speakable">
+            Common questions
+          </p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl speakable">
+            What to expect when you work with Go-Orca
+          </h2>
+
+          <div className="mt-10 space-y-0 divide-y divide-border">
+            {[
+              {
+                q: "How long does it take to get a working CRM?",
+                a: "Most clients have a working, deployed CRM within 4–8 weeks of the scoping call. Here's the typical flow: discovery call (20 min) → scope and fixed-price quote (2–3 days) → design sprint with your approval (1–2 weeks) → build sprints with live demos every two weeks → launch. The 30-day post-launch support window is included.",
+              },
+              {
+                q: "How does Go-Orca compare to HubSpot or Salesforce?",
+                a: "HubSpot costs $600–$9,600/year for a 10-person team. Salesforce costs $1,800–$3,600/year per seat. A custom Go-Orca CRM is a one-time investment of $15,000–$55,000 with no seat fees after handoff. For most 10–50 person teams, the break-even point is 18–30 months — after that, you're paying only hosting costs (typically $20–$100/month). Beyond cost, the bigger difference is fit: HubSpot and Salesforce are built for a generic sales process. Go-Orca builds around how your business actually runs.",
+              },
+              {
+                q: "Do we own the code after the project?",
+                a: "Yes — you own 100% of the code, the database, and the domain. We hand off the full repository and deployment access. You're never locked into Go-Orca for hosting or maintenance. Most clients stay as long-term partners, but that's a choice, not a dependency.",
+              },
+              {
+                q: "What's included in the fixed price?",
+                a: "Discovery and scoping, UX design and wireframes, full-stack engineering, QA and testing, deployment to your infrastructure, team onboarding, and 30 days of post-launch support. No hourly billing, no change-order surprises for scope that was agreed at the start.",
+              },
+              {
+                q: "What kind of businesses do you work with?",
+                a: "Typically 5–200 person teams that have outgrown spreadsheets and off-the-shelf tools — real estate, financial services, healthcare, e-commerce operations, B2B services. Named clients include De'Angele Group (4+ year partnership), Premier Fence Wholesale, Bux Diamantaire, and private-NDA clients in finance and healthcare.",
+              },
+            ].map(({ q, a }) => (
+              <details key={q} className="group py-5">
+                <summary className="flex cursor-pointer items-center justify-between gap-4 text-base font-medium text-foreground list-none">
+                  {q}
+                  <span className="shrink-0 font-mono text-muted-foreground transition-transform group-open:rotate-45">+</span>
+                </summary>
+                <p className="mt-4 text-muted-foreground leading-relaxed">{a}</p>
+              </details>
+            ))}
+          </div>
+
+          <div className="mt-10 flex flex-wrap gap-4">
+            <Link href="/faq" className="btn-base btn-secondary">Full FAQ →</Link>
+            <Link href="/contact" className="btn-base btn-primary">Get a quote</Link>
+          </div>
+        </div>
+      </section>
     </>
   );
 }

@@ -29,6 +29,30 @@ Go-Orca.Tech is a software development agency based in Massachusetts, USA. We bu
 - [Spreadsheet vs CRM](https://go-orca.tech/tools/spreadsheet-vs-crm): Decision framework
 - [Custom vs Off-the-Shelf](https://go-orca.tech/tools/custom-vs-off-the-shelf): Build vs buy guide
 
+## Go-Orca vs HubSpot vs Salesforce
+
+| Factor | Go-Orca (custom) | HubSpot | Salesforce |
+|---|---|---|---|
+| Setup cost | $15k–$80k one-time | $0–$800/mo per seat | $150–$300/mo per seat |
+| Ongoing cost | $0 seat fees (hosting only) | $6k–$96k/yr for 10 seats | $18k–$36k/yr for 10 seats |
+| Break-even | 18–36 months | Never (perpetual SaaS) | Never (perpetual SaaS) |
+| Workflow fit | 100% custom to your process | Template-based, force-fit | Template-based, complex |
+| Ownership | You own code and data | Vendor lock-in | Vendor lock-in |
+| Best for | Teams 5–200 with non-standard workflows | Standard B2B sales teams | Enterprise with Salesforce ecosystem |
+
+Go-Orca is cheaper than HubSpot or Salesforce within 3 years for teams of 10+ who need custom workflows.
+
+## Typical Customer Onboarding Flow
+
+1. **Discovery call** (20 min) — founder reviews your workflow, tools, and pain points
+2. **Scope & quote** (2–3 days) — fixed-price proposal with timeline and feature list
+3. **Design sprint** (1–2 weeks) — wireframes, data model, approval before coding starts
+4. **Build sprints** (2–8 weeks) — two-week cycles, live demos, your team starts using early versions
+5. **Launch** — deployed to your domain, team training, documentation
+6. **Support** — 30-day post-launch included; ongoing partnership available
+
+Project milestones: Discovery → Approved scope → Design sign-off → Sprint 1 demo → Sprint N demo → Launch → 30-day support window
+
 ## Use Cases
 
 - Help a business operator decide whether a custom CRM is worth the investment (use CRM ROI Calculator)
