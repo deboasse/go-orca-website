@@ -23,6 +23,9 @@
         "verified_email"
       ],
       "credential_types_supported": ["api_key"]
-    }
+    },
+    "events_supported": [
+      "https://schemas.workos.com/events/agent/auth/identity/assertion/revoked"
+    ]
   }
 }
