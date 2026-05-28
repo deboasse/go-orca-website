@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "serverUrl": "https://go-orca.tech/api/mcp",
   "registry": "https://smithery.ai/server/@go-orca/api-mcp",
+  "registryUrl": "https://mcp.smithery.run/go-orca",
   "serverInfo": {
     "name": "go-orca-tools",
     "version": "1.0.0",

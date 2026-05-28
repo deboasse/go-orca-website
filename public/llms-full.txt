@@ -124,6 +124,7 @@ Real cost ranges for web and mobile apps.
 **Developer Hub:** https://go-orca.tech/developers
 **MCP Endpoint:** https://go-orca.tech/api/mcp
 **MCP Registry (Smithery):** https://smithery.ai/server/@go-orca/api-mcp
+**MCP Smithery Proxy:** https://mcp.smithery.run/go-orca
 
 | Endpoint | Method | Auth | Description |
 |---|---|---|---|

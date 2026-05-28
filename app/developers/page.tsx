@@ -90,7 +90,7 @@ const resources = [
         title: "Smithery Registry Listing",
         href: "https://smithery.ai/server/@go-orca/api-mcp",
         type: "MCP registry",
-        desc: "Official Go-Orca MCP server listing on Smithery. Install directly from the registry or use the serverUrl https://go-orca.tech/api/mcp for direct JSON-RPC 2.0 access.",
+        desc: "Official Go-Orca MCP server listing on Smithery. Direct endpoint: https://go-orca.tech/api/mcp — Smithery-proxied endpoint: https://mcp.smithery.run/go-orca",
       },
       {
         title: "Schema Map",
