@@ -202,6 +202,65 @@ export default function Home() {
         </div>
       </Section>
 
+      {/* Case study / content density section */}
+      <section className="border-t border-border bg-background">
+        <div className="mx-auto max-w-7xl px-6 py-20 md:py-28">
+          <div className="mx-auto max-w-4xl">
+            <p className="inline-block font-mono text-[10px] uppercase tracking-[0.3em] bg-[oklch(0.38_0.27_295)] text-white px-1.5 py-px speakable">
+              Why custom software beats off-the-shelf
+            </p>
+            <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl speakable">
+              Built around how your business actually works — not the other way around.
+            </h2>
+            <div className="mt-8 grid gap-8 text-muted-foreground leading-relaxed sm:grid-cols-2">
+              <div className="space-y-4">
+                <p>
+                  Most CRM and business software tools are built for a fictional average company. They assume you run a
+                  standard sales pipeline, that your team structure fits their user model, and that their reporting covers
+                  what you actually need to see. They almost never do.
+                </p>
+                <p>
+                  Go-Orca builds software that starts with your specific workflow. We map your pipeline stages, your
+                  customer lifecycle, your team hierarchy, and your reporting needs before writing a line of code. The
+                  result is a system that feels obvious to your team on day one, because it was designed around how they
+                  already think and work.
+                </p>
+              </div>
+              <div className="space-y-4">
+                <p>
+                  The economics shift faster than most operators expect. A 10-person team paying $600/month for HubSpot
+                  or $900/month for Salesforce — tools they&apos;re using at 30% of their capability — is spending $7,200–
+                  $10,800 per year on software debt. A custom CRM built for that team costs roughly $20,000–$40,000 once
+                  and is paid off within two to four years, after which they own it outright with no seat fees, no
+                  surprise tier upgrades, and no feature held hostage behind a higher plan.
+                </p>
+                <p>
+                  Our clients typically see 12–20 hours per week recovered from manual data entry and context-switching
+                  within the first 90 days. For a 10-person team at an average loaded cost of $75/hour, that&apos;s $46,000–
+                  $78,000 in recovered capacity per year.{" "}
+                  <Link href="/tools/crm-roi-calculator" className="text-foreground underline underline-offset-2 hover:text-primary">
+                    Calculate your own ROI →
+                  </Link>
+                </p>
+              </div>
+            </div>
+            <div className="mt-10 grid gap-6 border-t border-border pt-10 sm:grid-cols-3">
+              {[
+                { stat: "4+ years", label: "Longest client partnership", sub: "De'Angele Group — technical marketing operations" },
+                { stat: "6 weeks", label: "Average time to first deploy", sub: "From scoping call to working CRM in your hands" },
+                { stat: "$0", label: "Per-seat licensing after handoff", sub: "You own the code, the data, and the domain" },
+              ].map(({ stat, label, sub }) => (
+                <div key={label} className="border-l border-border pl-5">
+                  <div className="text-3xl font-semibold text-foreground">{stat}</div>
+                  <div className="mt-1 text-sm font-medium text-foreground">{label}</div>
+                  <div className="mt-1 text-xs text-muted-foreground">{sub}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Metrics */}
       <section className="border-y border-border bg-background">
         <div className="mx-auto grid max-w-7xl gap-px overflow-hidden border-x border-border md:grid-cols-3">
