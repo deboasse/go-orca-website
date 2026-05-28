@@ -21,9 +21,9 @@
       ],
       "service-desc": [
         {
-          "href": "https://go-orca.tech/auth.md",
-          "type": "text/markdown",
-          "title": "Agent Authentication Guide"
+          "href": "https://go-orca.tech/openapi.json",
+          "type": "application/vnd.oai.openapi+json",
+          "title": "Go-Orca OpenAPI 3.1 Specification"
         }
       ],
       "service-doc": [

@@ -1,0 +1,444 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Go-Orca API",
+    "version": "1.0.0",
+    "description": "Public API for Go-Orca.Tech — custom CRM and business software platform. Agents authenticate via /api/agent/auth and can read and update CRM leads. Public endpoints require no authentication.",
+    "contact": {
+      "name": "Go-Orca Support",
+      "email": "hello@go-orca.tech",
+      "url": "https://go-orca.tech/contact"
+    },
+    "license": {
+      "name": "Proprietary"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://go-orca.tech",
+      "description": "Production"
+    }
+  ],
+  "tags": [
+    { "name": "auth", "description": "Agent authentication and registration" },
+    { "name": "leads", "description": "CRM lead pipeline (requires authentication)" },
+    { "name": "public", "description": "Public endpoints — no authentication required" }
+  ],
+  "paths": {
+    "/api/agent/auth": {
+      "post": {
+        "operationId": "registerAgent",
+        "summary": "Register an agent and obtain a credential",
+        "description": "Supports anonymous registration (immediate API key) and identity_assertion (id-jag or verified_email). See https://go-orca.tech/auth.md for the full flow.",
+        "tags": ["auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  { "$ref": "#/components/schemas/AnonymousRegistration" },
+                  { "$ref": "#/components/schemas/IdentityAssertionRegistration" }
+                ]
+              },
+              "examples": {
+                "anonymous": {
+                  "summary": "Anonymous registration",
+                  "value": {
+                    "type": "anonymous",
+                    "requested_credential_type": "api_key"
+                  }
+                },
+                "identity_assertion_email": {
+                  "summary": "Identity assertion via email",
+                  "value": {
+                    "type": "identity_assertion",
+                    "assertion_type": "verified_email",
+                    "assertion": "user@example.com",
+                    "requested_credential_type": "api_key"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Registration successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    { "$ref": "#/components/schemas/AnonymousRegistrationResponse" },
+                    { "$ref": "#/components/schemas/EmailVerificationResponse" }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      }
+    },
+    "/api/agent/auth/claim": {
+      "post": {
+        "operationId": "triggerClaimEmail",
+        "summary": "Trigger claim email for anonymous registration",
+        "description": "Sends a 6-digit OTP to the provided email to claim an anonymous registration.",
+        "tags": ["auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ClaimRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Claim email triggered",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ClaimInitiatedResponse" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      }
+    },
+    "/api/agent/auth/claim/complete": {
+      "post": {
+        "operationId": "completeClaimCeremony",
+        "summary": "Submit OTP to complete the claim ceremony",
+        "description": "Validates the OTP from the claim email. On success, upgrades scope or issues a credential.",
+        "tags": ["auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ClaimCompleteRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Claim successful",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ClaimCompleteResponse" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      }
+    },
+    "/api/leads": {
+      "get": {
+        "operationId": "listLeads",
+        "summary": "List CRM leads",
+        "description": "Returns leads from the Go-Orca pipeline. Filter by status. Requires leads:read scope.",
+        "tags": ["leads"],
+        "security": [{ "BearerAuth": ["leads:read"] }],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["new", "contacted", "qualified", "converted", "closed"]
+            },
+            "description": "Filter leads by status"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 50, "maximum": 200 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of leads",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "leads": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Lead" }
+                    },
+                    "total": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      },
+      "patch": {
+        "operationId": "updateLead",
+        "summary": "Update a lead's status or notes",
+        "description": "Update the status, notes, or other mutable fields of a lead. Requires leads:write scope.",
+        "tags": ["leads"],
+        "security": [{ "BearerAuth": ["leads:write"] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LeadUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Lead updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Lead" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      }
+    },
+    "/api/quote": {
+      "post": {
+        "operationId": "submitQuote",
+        "summary": "Submit a custom software quote request",
+        "description": "Submits a quote request. No authentication required. A Go-Orca founder reviews and responds within 1 business day.",
+        "tags": ["public"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/QuoteRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Quote request submitted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "API key obtained from /api/agent/auth. Pass as Authorization: Bearer <key>."
+      }
+    },
+    "schemas": {
+      "AnonymousRegistration": {
+        "type": "object",
+        "required": ["type", "requested_credential_type"],
+        "properties": {
+          "type": { "type": "string", "const": "anonymous" },
+          "requested_credential_type": { "type": "string", "enum": ["api_key"] }
+        }
+      },
+      "IdentityAssertionRegistration": {
+        "type": "object",
+        "required": ["type", "assertion_type", "assertion", "requested_credential_type"],
+        "properties": {
+          "type": { "type": "string", "const": "identity_assertion" },
+          "assertion_type": {
+            "type": "string",
+            "enum": ["urn:ietf:params:oauth:token-type:id-jag", "verified_email"]
+          },
+          "assertion": { "type": "string", "description": "The JWT (id-jag) or email address" },
+          "requested_credential_type": { "type": "string", "enum": ["api_key"] }
+        }
+      },
+      "AnonymousRegistrationResponse": {
+        "type": "object",
+        "properties": {
+          "registration_id": { "type": "string" },
+          "registration_type": { "type": "string", "enum": ["anonymous"] },
+          "credential_type": { "type": "string", "enum": ["api_key"] },
+          "credential": { "type": "string", "description": "The API key to use as Bearer token" },
+          "credential_expires": { "type": ["string", "null"], "format": "date-time" },
+          "scopes": { "type": "array", "items": { "type": "string" } },
+          "claim_url": { "type": "string", "format": "uri" },
+          "claim_token": { "type": "string" },
+          "claim_token_expires": { "type": "string", "format": "date-time" },
+          "post_claim_scopes": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "EmailVerificationResponse": {
+        "type": "object",
+        "properties": {
+          "registration_id": { "type": "string" },
+          "registration_type": { "type": "string", "enum": ["email-verification"] },
+          "claim_url": { "type": "string", "format": "uri" },
+          "claim_token": { "type": "string" },
+          "claim_token_expires": { "type": "string", "format": "date-time" },
+          "post_claim_scopes": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "ClaimRequest": {
+        "type": "object",
+        "required": ["claim_token", "email"],
+        "properties": {
+          "claim_token": { "type": "string" },
+          "email": { "type": "string", "format": "email" }
+        }
+      },
+      "ClaimInitiatedResponse": {
+        "type": "object",
+        "properties": {
+          "registration_id": { "type": "string" },
+          "claim_attempt_id": { "type": "string" },
+          "status": { "type": "string", "enum": ["initiated"] },
+          "expires_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "ClaimCompleteRequest": {
+        "type": "object",
+        "required": ["claim_token", "otp"],
+        "properties": {
+          "claim_token": { "type": "string" },
+          "otp": { "type": "string", "minLength": 6, "maxLength": 6 }
+        }
+      },
+      "ClaimCompleteResponse": {
+        "type": "object",
+        "properties": {
+          "registration_id": { "type": "string" },
+          "status": { "type": "string", "enum": ["claimed"] },
+          "credential_type": { "type": "string", "enum": ["api_key"] },
+          "credential": { "type": "string" },
+          "credential_expires": { "type": ["string", "null"], "format": "date-time" },
+          "scopes": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "Lead": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "company": { "type": "string" },
+          "contact_name": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "status": {
+            "type": "string",
+            "enum": ["new", "contacted", "qualified", "converted", "closed"]
+          },
+          "pain_points": { "type": "string" },
+          "goals": { "type": "string" },
+          "notes": { "type": "string" },
+          "current_tools": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "LeadUpdate": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "status": {
+            "type": "string",
+            "enum": ["new", "contacted", "qualified", "converted", "closed"]
+          },
+          "notes": { "type": "string" }
+        }
+      },
+      "QuoteRequest": {
+        "type": "object",
+        "required": ["name", "email", "company", "description"],
+        "properties": {
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "company": { "type": "string" },
+          "description": { "type": "string", "description": "What you need built" },
+          "team_size": { "type": "integer" },
+          "budget": { "type": "string" },
+          "timeline": { "type": "string" }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string" },
+          "code": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Bad request",
+        "content": {
+          "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+        }
+      },
+      "Unauthorized": {
+        "description": "Missing or invalid credential",
+        "headers": {
+          "WWW-Authenticate": {
+            "schema": { "type": "string" },
+            "example": "Bearer resource_metadata=\"https://go-orca.tech/.well-known/oauth-protected-resource\""
+          }
+        },
+        "content": {
+          "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+        }
+      },
+      "Forbidden": {
+        "description": "Insufficient scope",
+        "content": {
+          "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+        }
+      },
+      "RateLimited": {
+        "description": "Rate limit exceeded",
+        "headers": {
+          "Retry-After": { "schema": { "type": "integer" } },
+          "X-RateLimit-Limit": { "schema": { "type": "integer" } },
+          "X-RateLimit-Remaining": { "schema": { "type": "integer" } },
+          "X-RateLimit-Reset": { "schema": { "type": "integer" } }
+        },
+        "content": {
+          "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+        }
+      }
+    }
+  }
+}

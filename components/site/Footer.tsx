@@ -22,7 +22,7 @@ export function Footer() {
   return (
     <footer className="border-t border-border bg-background">
       <div className="mx-auto max-w-7xl px-6 py-16">
-        <div className="grid gap-12 md:grid-cols-5">
+        <div className="grid gap-12 md:grid-cols-6">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 leading-none">
               <Image src="/orca-logo.png" alt="GO-ORCA logo" width={40} height={40} className="h-10 w-10 object-contain shrink-0" />
@@ -54,6 +54,15 @@ export function Footer() {
               { href: "/tools", label: "Tools" },
               { href: "/careers", label: "Careers" },
               { href: "/contact", label: "Contact" },
+            ]}
+          />
+          <Col
+            title="Developers"
+            links={[
+              { href: "/auth.md", label: "Auth guide" },
+              { href: "/openapi.json", label: "OpenAPI spec" },
+              { href: "/.well-known/agent-skills/index.json", label: "Agent skills" },
+              { href: "/llms.txt", label: "llms.txt" },
             ]}
           />
           <Col
